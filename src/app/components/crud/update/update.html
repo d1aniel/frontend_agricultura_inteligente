@@ -1,0 +1,36 @@
+<section class="crud-page">
+  <header class="crud-header">
+    <div>
+      <p>{{ entity().app }}</p>
+      <h2>Modificar {{ entity().label }} #{{ id() }}</h2>
+      <small>{{ message() }}</small>
+    </div>
+
+    <a class="secondary-action" [routerLink]="['/', entity().route]">Volver</a>
+  </header>
+
+  <form class="crud-form" (ngSubmit)="submit()">
+    @for (field of entity().fields; track field.key) {
+      <label [class.checkbox-field]="field.type === 'checkbox'">
+        <span>{{ field.label }}</span>
+
+        @if (field.type === 'select') {
+          <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
+            <option value="">Seleccionar</option>
+            @for (option of field.options ?? []; track option) {
+              <option [value]="option">{{ option }}</option>
+            }
+          </select>
+        } @else if (field.type === 'textarea') {
+          <textarea [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true"></textarea>
+        } @else if (field.type === 'checkbox') {
+          <input type="checkbox" [name]="field.key" [(ngModel)]="payload[field.key]" />
+        } @else {
+          <input [type]="field.type" [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true" />
+        }
+      </label>
+    }
+
+    <button type="submit" class="primary-action">Actualizar</button>
+  </form>
+</section>

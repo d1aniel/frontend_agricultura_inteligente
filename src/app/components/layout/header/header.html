@@ -1,0 +1,15 @@
+<header class="topbar">
+  <div>
+    <p>Sistema de riego inteligente</p>
+    <h1>Sitio administrativo</h1>
+  </div>
+
+  <div class="user-area">
+    <div class="user-chip">
+      <span>{{ initials }}</span>
+      <strong>{{ user?.nombre_completo || user?.username || 'Usuario' }}</strong>
+    </div>
+
+    <button type="button" class="logout-button" (click)="logout()">Salir</button>
+  </div>
+</header>

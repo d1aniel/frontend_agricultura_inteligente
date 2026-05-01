@@ -1,0 +1,35 @@
+<section class="auth-page">
+  <div class="auth-panel otp-panel">
+    <header>
+      <span class="brand-mark">RI</span>
+      <p>Verificacion en dos pasos</p>
+      <h1>Codigo de correo</h1>
+      <small>{{ message() || challenge?.message || 'Ingresa el codigo de 6 digitos enviado a tu correo.' }}</small>
+    </header>
+
+    <form class="auth-form" (ngSubmit)="submit()">
+      <label>
+        <span>Codigo OTP</span>
+        <input
+          type="text"
+          name="codigo"
+          inputmode="numeric"
+          maxlength="6"
+          minlength="6"
+          required
+          [ngModel]="code()"
+          (ngModelChange)="code.set($event)"
+          autocomplete="one-time-code"
+        />
+      </label>
+
+      <button type="submit" class="primary-action" [disabled]="loading() || code().length !== 6">
+        {{ loading() ? 'Verificando...' : 'Verificar y entrar' }}
+      </button>
+    </form>
+
+    <footer>
+      <a routerLink="/login">Volver al login</a>
+    </footer>
+  </div>
+</section>

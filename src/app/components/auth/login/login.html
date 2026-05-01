@@ -1,0 +1,36 @@
+<section class="auth-page">
+  <div class="auth-panel">
+    <header>
+      <span class="brand-mark">RI</span>
+      <p>Sistema de riego inteligente</p>
+      <h1>Iniciar sesion</h1>
+      <small>{{ message() || 'Ingresa tus credenciales. Te enviaremos un codigo al correo.' }}</small>
+    </header>
+
+    <form class="auth-form" (ngSubmit)="submit()">
+      <label>
+        <span>Usuario</span>
+        <input type="text" name="username" [(ngModel)]="credentials.username" required autocomplete="username" />
+      </label>
+
+      <label>
+        <span>Contrasena</span>
+        <input type="password" name="password" [(ngModel)]="credentials.password" required autocomplete="current-password" />
+      </label>
+
+      <label>
+        <span>Dispositivo</span>
+        <input type="text" name="device" [(ngModel)]="credentials.nombre_dispositivo" />
+      </label>
+
+      <button type="submit" class="primary-action" [disabled]="loading()">
+        {{ loading() ? 'Enviando codigo...' : 'Continuar' }}
+      </button>
+    </form>
+
+    <footer>
+      <span>No tienes cuenta?</span>
+      <a routerLink="/registro">Crear cuenta</a>
+    </footer>
+  </div>
+</section>

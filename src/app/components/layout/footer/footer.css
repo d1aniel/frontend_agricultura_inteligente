@@ -1,0 +1,21 @@
+.footer {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: auto;
+  padding: 16px 28px;
+  border-top: 1px solid #dce5df;
+  background: rgba(255, 255, 255, 0.9);
+  color: #526158;
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 18px;
+  }
+}

@@ -1,0 +1,60 @@
+:host {
+  display: block;
+}
+
+.brand {
+  margin-bottom: 22px;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #f4faf6;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #7cc66a;
+  color: #10251a;
+  font-weight: 800;
+}
+
+.brand small {
+  display: block;
+  margin-top: 2px;
+  color: #aab8af;
+}
+
+.nav-list {
+  display: grid;
+  gap: 4px;
+}
+
+.nav-group {
+  margin: 18px 10px 6px;
+  color: #aab8af;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  border-radius: 8px;
+  color: #dfe9e2;
+  padding: 10px 12px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.nav-item:hover,
+.nav-item-active {
+  background: #20382a;
+  color: #ffffff;
+}

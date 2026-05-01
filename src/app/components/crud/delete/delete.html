@@ -1,0 +1,25 @@
+<section class="crud-page">
+  <header class="crud-header">
+    <div>
+      <p>{{ entity().app }}</p>
+      <h2>Eliminar {{ entity().label }} #{{ id() }}</h2>
+      <small>{{ message() }}</small>
+    </div>
+
+    <a class="secondary-action" [routerLink]="['/', entity().route]">Volver</a>
+  </header>
+
+  <div class="record-preview">
+    @for (entry of entries(); track entry[0]) {
+      <div>
+        <span>{{ entry[0] }}</span>
+        <strong>{{ entry[1] }}</strong>
+      </div>
+    }
+  </div>
+
+  <div class="actions">
+    <button type="button" class="danger-action" (click)="confirmDelete()">Confirmar eliminacion</button>
+    <a class="secondary-action" [routerLink]="['/', entity().route]">Cancelar</a>
+  </div>
+</section>

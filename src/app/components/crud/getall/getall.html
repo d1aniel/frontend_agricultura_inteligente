@@ -1,0 +1,51 @@
+<section class="crud-page">
+  <header class="crud-header">
+    <div>
+      <p>{{ entity().app }}</p>
+      <h2>{{ entity().pluralLabel }}</h2>
+      <small>{{ message() }}</small>
+    </div>
+
+    <a class="primary-action" [routerLink]="['/', entity().route, 'create']">Nuevo registro</a>
+  </header>
+
+  <div class="toolbar">
+    <label>
+      Buscar
+      <input
+        type="search"
+        placeholder="Filtrar registros..."
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+      />
+    </label>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ entity().idField }}</th>
+          @for (field of visibleFields(); track field.key) {
+            <th>{{ field.label }}</th>
+          }
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of filteredRows(); track value(row, entity().idField)) {
+          <tr>
+            <td>{{ value(row, entity().idField) }}</td>
+            @for (field of visibleFields(); track field.key) {
+              <td>{{ value(row, field.key) }}</td>
+            }
+            <td class="actions">
+              <a [routerLink]="['/', entity().route, 'update', value(row, entity().idField)]">Modificar</a>
+              <a class="danger" [routerLink]="['/', entity().route, 'delete', value(row, entity().idField)]">Eliminar</a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

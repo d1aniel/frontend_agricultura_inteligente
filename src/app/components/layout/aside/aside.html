@@ -1,0 +1,25 @@
+<div class="brand">
+  <a class="brand-link" routerLink="/">
+    <span class="brand-mark">RI</span>
+    <span>
+      <strong>Riego IoT</strong>
+      <small>Administracion</small>
+    </span>
+  </a>
+</div>
+
+<nav class="nav-list" aria-label="Modulos administrativos">
+  <a class="nav-item" routerLink="/" routerLinkActive="nav-item-active" [routerLinkActiveOptions]="{ exact: true }">
+    Panel general
+  </a>
+
+  @for (group of groups; track group.label) {
+    <p class="nav-group">{{ group.label }}</p>
+
+    @for (item of group.items; track item.key) {
+      <a class="nav-item" [routerLink]="['/', item.route]" routerLinkActive="nav-item-active">
+        {{ item.pluralLabel }}
+      </a>
+    }
+  }
+</nav>

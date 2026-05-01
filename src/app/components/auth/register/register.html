@@ -1,0 +1,53 @@
+<section class="auth-page">
+  <div class="auth-panel">
+    <header>
+      <span class="brand-mark">RI</span>
+      <p>Sistema de riego inteligente</p>
+      <h1>Crear cuenta</h1>
+      <small>{{ message() || 'El correo es obligatorio porque recibira el codigo de verificacion.' }}</small>
+    </header>
+
+    <form class="auth-form" (ngSubmit)="submit()">
+      <div class="field-grid">
+        <label>
+          <span>Nombres</span>
+          <input type="text" name="first_name" [(ngModel)]="form.first_name" autocomplete="given-name" />
+        </label>
+
+        <label>
+          <span>Apellidos</span>
+          <input type="text" name="last_name" [(ngModel)]="form.last_name" autocomplete="family-name" />
+        </label>
+      </div>
+
+      <label>
+        <span>Usuario</span>
+        <input type="text" name="username" [(ngModel)]="form.username" required autocomplete="username" />
+      </label>
+
+      <label>
+        <span>Correo</span>
+        <input type="email" name="email" [(ngModel)]="form.email" required autocomplete="email" />
+      </label>
+
+      <label>
+        <span>Telefono</span>
+        <input type="text" name="telefono" [(ngModel)]="form.telefono" autocomplete="tel" />
+      </label>
+
+      <label>
+        <span>Contrasena</span>
+        <input type="password" name="password" [(ngModel)]="form.password" required autocomplete="new-password" />
+      </label>
+
+      <button type="submit" class="primary-action" [disabled]="loading()">
+        {{ loading() ? 'Enviando codigo...' : 'Registrarme' }}
+      </button>
+    </form>
+
+    <footer>
+      <span>Ya tienes cuenta?</span>
+      <a routerLink="/login">Iniciar sesion</a>
+    </footer>
+  </div>
+</section>
