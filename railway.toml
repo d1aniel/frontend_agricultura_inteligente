@@ -1,5 +1,2 @@
-[build]
-builder = "NIXPACKS"
-
 [deploy]
-startCommand = "node dist/frontend/server/server.mjs"
+startCommand = "npx serve -s dist/frontend -l $PORT"
