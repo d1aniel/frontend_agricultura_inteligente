@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AdminEntity } from '../models/admin.models';
+import { environment } from '../../environments/environment';
 
 export type AdminPayload = Record<string, string | number | boolean | null>;
 
@@ -9,7 +10,7 @@ export type AdminPayload = Record<string, string | number | boolean | null>;
   providedIn: 'root'
 })
 export class AdminApiService {
-  private readonly apiUrl = 'http://127.0.0.1:8000/api';
+  private readonly apiUrl = `${environment.apiUrl}/api`;
 
   constructor(private readonly http: HttpClient) {}
 

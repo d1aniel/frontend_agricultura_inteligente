@@ -1,2 +1,2 @@
 [deploy]
-startCommand = "npx serve -s dist/frontend -l $PORT"
+startCommand = "npx serve -s dist/frontend/browser -l $PORT"
