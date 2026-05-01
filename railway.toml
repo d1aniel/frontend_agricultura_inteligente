@@ -1,8 +1,5 @@
 [build]
 builder = "NIXPACKS"
 
-[build.environment]
-NODE_VERSION = "20"
-
 [deploy]
-startCommand = "npx serve -s dist/frontend"
+startCommand = "node dist/frontend/server/server.mjs"
