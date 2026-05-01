@@ -4,7 +4,7 @@
       <span class="brand-mark">RI</span>
       <p>Sistema de riego inteligente</p>
       <h1>Crear cuenta</h1>
-      <small>{{ message() || 'El correo es obligatorio porque recibira el codigo de verificacion.' }}</small>
+      <small>{{ message() || 'Completa tus datos para crear una cuenta.' }}</small>
     </header>
 
     <form class="auth-form" (ngSubmit)="submit()">
@@ -41,7 +41,7 @@
       </label>
 
       <button type="submit" class="primary-action" [disabled]="loading()">
-        {{ loading() ? 'Enviando codigo...' : 'Registrarme' }}
+        {{ loading() ? 'Creando cuenta...' : 'Registrarme' }}
       </button>
     </form>
 

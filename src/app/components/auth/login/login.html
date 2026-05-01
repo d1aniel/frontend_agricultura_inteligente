@@ -4,7 +4,7 @@
       <span class="brand-mark">RI</span>
       <p>Sistema de riego inteligente</p>
       <h1>Iniciar sesion</h1>
-      <small>{{ message() || 'Ingresa tus credenciales. Te enviaremos un codigo al correo.' }}</small>
+      <small>{{ message() || 'Ingresa tus credenciales para acceder al sistema.' }}</small>
     </header>
 
     <form class="auth-form" (ngSubmit)="submit()">
@@ -24,7 +24,7 @@
       </label>
 
       <button type="submit" class="primary-action" [disabled]="loading()">
-        {{ loading() ? 'Enviando codigo...' : 'Continuar' }}
+        {{ loading() ? 'Iniciando sesion...' : 'Continuar' }}
       </button>
     </form>
 

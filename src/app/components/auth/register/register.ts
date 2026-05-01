@@ -30,10 +30,10 @@ export class Register {
 
   protected submit(): void {
     this.loading.set(true);
-    this.message.set('Creando cuenta y enviando codigo...');
+    this.message.set('Creando cuenta...');
 
     this.auth.register(this.form).subscribe({
-      next: () => this.router.navigate(['/verificar-2fa']),
+      next: () => this.router.navigate(['/']),
       error: () => {
         this.loading.set(false);
         this.message.set('No se pudo crear la cuenta. Revisa los datos ingresados.');

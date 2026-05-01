@@ -30,7 +30,7 @@ export class Login {
     this.message.set('Validando credenciales...');
 
     this.auth.login(this.credentials).subscribe({
-      next: () => this.router.navigate(['/verificar-2fa']),
+      next: () => this.router.navigate(['/']),
       error: () => {
         this.loading.set(false);
         this.message.set('No se pudo iniciar sesion. Revisa usuario y contrasena.');

@@ -15,6 +15,6 @@ export class App {
   constructor(private readonly router: Router) {}
 
   isAuthRoute(): boolean {
-    return ['/login', '/registro', '/verificar-2fa'].some((path) => this.router.url.startsWith(path));
+    return ['/login', '/registro'].some((path) => this.router.url.startsWith(path));
   }
 }

@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { Create } from './components/crud/create/create';
 import { Login } from './components/auth/login/login';
 import { Register } from './components/auth/register/register';
-import { VerifyOtp } from './components/auth/verify-otp/verify-otp';
 import { Delete } from './components/crud/delete/delete';
 import { Getall } from './components/crud/getall/getall';
 import { Update } from './components/crud/update/update';
@@ -36,7 +35,6 @@ const crudRoutes: Routes = ADMIN_ENTITIES.flatMap((entity) => [
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard], title: 'Iniciar sesion' },
   { path: 'registro', component: Register, canActivate: [guestGuard], title: 'Crear cuenta' },
-  { path: 'verificar-2fa', component: VerifyOtp, canActivate: [guestGuard], title: 'Verificar codigo' },
   { path: '', component: Dashboard, canActivate: [authGuard], title: 'Panel general' },
   ...crudRoutes.map((route) => ({ ...route, canActivate: [authGuard] })),
   { path: '**', redirectTo: '' }
