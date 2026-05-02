@@ -9,28 +9,30 @@ import { Dashboard } from './components/dashboard/dashboard';
 import { ADMIN_ENTITIES } from './models/admin.models';
 import { administrativeRoleGuard, authGuard, guestGuard } from './services/auth.guard';
 
-const crudRoutes: Routes = ADMIN_ENTITIES.flatMap((entity) => [
-  {
-    path: entity.route,
-    component: Getall,
-    data: { entityKey: entity.key, action: 'getall' }
-  },
-  {
-    path: `${entity.route}/create`,
-    component: Create,
-    data: { entityKey: entity.key, action: 'create' }
-  },
-  {
-    path: `${entity.route}/update/:id`,
-    component: Update,
-    data: { entityKey: entity.key, action: 'update' }
-  },
-  {
-    path: `${entity.route}/delete/:id`,
-    component: Delete,
-    data: { entityKey: entity.key, action: 'delete' }
-  }
-]);
+const crudRoutes: Routes = ADMIN_ENTITIES
+  .filter((entity) => entity.hideFromRoutes !== true)
+  .flatMap((entity) => [
+    {
+      path: entity.route,
+      component: Getall,
+      data: { entityKey: entity.key, action: 'getall' }
+    },
+    {
+      path: `${entity.route}/create`,
+      component: Create,
+      data: { entityKey: entity.key, action: 'create' }
+    },
+    {
+      path: `${entity.route}/update/:id`,
+      component: Update,
+      data: { entityKey: entity.key, action: 'update' }
+    },
+    {
+      path: `${entity.route}/delete/:id`,
+      component: Delete,
+      data: { entityKey: entity.key, action: 'delete' }
+    }
+  ]);
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard], title: 'Iniciar sesion' },

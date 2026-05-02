@@ -10,19 +10,21 @@
   </header>
 
   <form class="crud-form" (ngSubmit)="submit()">
-    @for (field of entity().fields; track field.key) {
+    @for (field of formFields(); track field.key) {
       <label [class.checkbox-field]="field.type === 'checkbox'">
         <span>{{ field.label }}</span>
 
         @if (field.relation) {
-          <div class="relation-control">
+          <div class="relation-control" [class.relation-control-single]="!canCreateRelated(field)">
             <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
               <option value="">Seleccionar</option>
               @for (row of rowsFor(field); track $index) {
                 <option [value]="optionValue(field, row)">{{ optionLabel(field, row) }}</option>
               }
             </select>
-            <a class="add-related" [routerLink]="createRoute(field)" [title]="'Crear ' + field.label">+</a>
+            @if (canCreateRelated(field)) {
+              <a class="add-related" [routerLink]="createRoute(field)" [title]="'Crear ' + field.label">+</a>
+            }
           </div>
         } @else if (field.type === 'select') {
           <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">

@@ -27,7 +27,7 @@ export class Aside {
   protected readonly groups = computed<AsideGroup[]>(() => {
     const canSeeAdministrativeModules = this.auth.hasAdministrativeRole;
     const visibleEntities = ADMIN_ENTITIES.filter((entity) =>
-      !entity.requiresAdministrativeRole || canSeeAdministrativeModules
+      entity.hideFromNavigation !== true && (!entity.requiresAdministrativeRole || canSeeAdministrativeModules)
     );
 
     return Object.entries(

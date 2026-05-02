@@ -54,6 +54,10 @@ textarea {
   gap: 8px;
 }
 
+.relation-control-single {
+  grid-template-columns: 1fr;
+}
+
 .add-related {
   min-height: 42px;
   display: inline-flex;

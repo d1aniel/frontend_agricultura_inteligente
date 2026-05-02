@@ -16,6 +16,7 @@ export class Update {
   protected readonly payload: AdminPayload = {};
   protected readonly relationOptions = signal<Record<string, AdminPayload[]>>({});
   protected readonly message = signal('Cargando registro...');
+  protected readonly formFields = signal<AdminField[]>([]);
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -24,6 +25,7 @@ export class Update {
   ) {
     this.route.data.subscribe((data) => {
       this.entity.set(findAdminEntity(data['entityKey']));
+      this.formFields.set(this.entity().fields.filter((field) => field.hideInForm !== true));
       this.id.set(this.route.snapshot.paramMap.get('id') ?? '');
       this.loadRelationOptions();
       this.loadRow();
@@ -63,6 +65,10 @@ export class Update {
     return ['/', field.relation?.createRoute ?? findAdminEntity(field.relation?.entityKey).route, 'create'];
   }
 
+  protected canCreateRelated(field: AdminField): boolean {
+    return field.relation?.allowCreate !== false;
+  }
+
   private loadRow(): void {
     const entity = this.entity();
 
@@ -77,7 +83,7 @@ export class Update {
 
   private setPayload(row: AdminPayload): void {
     Object.keys(this.payload).forEach((key) => delete this.payload[key]);
-    this.entity().fields.forEach((field) => {
+    this.formFields().forEach((field) => {
       this.payload[field.key] = row[field.key] ?? (field.type === 'checkbox' ? false : '');
     });
   }
@@ -85,7 +91,7 @@ export class Update {
   private loadRelationOptions(): void {
     this.relationOptions.set({});
 
-    this.entity().fields
+    this.formFields()
       .filter((field) => field.relation)
       .forEach((field) => {
         const relatedEntity = findAdminEntity(field.relation?.entityKey);
@@ -104,7 +110,7 @@ export class Update {
   private cleanPayload(): AdminPayload {
     const cleaned: AdminPayload = {};
 
-    this.entity().fields.forEach((field) => {
+    this.formFields().forEach((field) => {
       const value = this.payload[field.key];
       cleaned[field.key] = value === '' && (field.relation || field.type === 'number' || field.type === 'date' || field.type === 'datetime-local')
         ? null

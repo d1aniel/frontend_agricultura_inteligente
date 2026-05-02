@@ -14,7 +14,9 @@ type IrrigationState = 'Encendido' | 'Apagado';
 })
 export class Dashboard {
   protected readonly entities = computed(() =>
-    ADMIN_ENTITIES.filter((entity) => !entity.requiresAdministrativeRole || this.auth.hasAdministrativeRole)
+    ADMIN_ENTITIES.filter((entity) =>
+      entity.hideFromNavigation !== true && (!entity.requiresAdministrativeRole || this.auth.hasAdministrativeRole)
+    )
   );
   protected readonly irrigationState = signal<IrrigationState>('Apagado');
   protected readonly commandStatus = signal('Sin comandos pendientes');

@@ -16,7 +16,7 @@ export class Getall {
   protected readonly relationOptions = signal<Record<string, AdminPayload[]>>({});
   protected readonly search = signal('');
   protected readonly message = signal('Cargando datos desde el API...');
-  protected readonly visibleFields = computed(() => this.entity().fields.slice(0, 5));
+  protected readonly visibleFields = computed(() => this.entity().fields.filter((field) => field.hideInList !== true).slice(0, 5));
   protected readonly filteredRows = computed(() => {
     const term = this.search().trim().toLowerCase();
     if (!term) {

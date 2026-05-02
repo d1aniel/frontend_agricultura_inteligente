@@ -5,6 +5,7 @@ export interface AdminRelation {
   valueField?: string;
   labelFields?: string[];
   createRoute?: string;
+  allowCreate?: boolean;
 }
 
 export interface AdminField {
@@ -14,6 +15,8 @@ export interface AdminField {
   required?: boolean;
   options?: string[];
   relation?: AdminRelation;
+  hideInList?: boolean;
+  hideInForm?: boolean;
 }
 
 export interface AdminEntity {
@@ -26,6 +29,8 @@ export interface AdminEntity {
   app: 'usuarios' | 'ubicaciones' | 'iot' | 'riego' | 'sistema';
   idField: string;
   requiresAdministrativeRole?: boolean;
+  hideFromNavigation?: boolean;
+  hideFromRoutes?: boolean;
   fields: AdminField[];
   sampleRows: Record<string, string | number | boolean>[];
 }
@@ -290,6 +295,28 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     ]
   },
   {
+    key: 'auth_user',
+    route: 'auth-users',
+    endpoint: 'auth-users',
+    apiBasePath: 'api_usuarios',
+    label: 'Usuario auth',
+    pluralLabel: 'Usuarios auth',
+    app: 'usuarios',
+    idField: 'id',
+    requiresAdministrativeRole: true,
+    hideFromNavigation: true,
+    hideFromRoutes: true,
+    fields: [
+      { key: 'nombre_completo', label: 'Nombre', type: 'text' },
+      { key: 'username', label: 'Usuario', type: 'text' },
+      { key: 'email', label: 'Email', type: 'email' },
+      { key: 'is_active', label: 'Activo', type: 'checkbox' }
+    ],
+    sampleRows: [
+      { id: 1, nombre_completo: 'Admin Riego', username: 'admin', email: 'admin@agrosmart.local', is_active: true }
+    ]
+  },
+  {
     key: 'usuario',
     route: 'usuarios',
     endpoint: 'usuarios',
@@ -300,13 +327,16 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     idField: 'id',
     requiresAdministrativeRole: true,
     fields: [
-      { key: 'usuario', label: 'Usuario auth', type: 'number', required: true },
+      { key: 'nombre_completo', label: 'Nombre', type: 'text', hideInForm: true },
+      { key: 'username', label: 'Usuario', type: 'text', hideInForm: true },
+      { key: 'email', label: 'Email', type: 'email', hideInForm: true },
+      { key: 'usuario', label: 'Usuario', type: 'select', required: true, hideInList: true, relation: { entityKey: 'auth_user', labelFields: ['nombre_completo', 'username', 'email'], allowCreate: false } },
       { key: 'organizacion', label: 'Organizacion', type: 'select', relation: { entityKey: 'organizacion', labelFields: ['nombre', 'nit_documento'], createRoute: 'organizaciones' } },
       { key: 'telefono', label: 'Telefono', type: 'text' },
       { key: 'estado', label: 'Estado', type: 'select', options: ['ACTIVO', 'INACTIVO', 'BLOQUEADO'] }
     ],
     sampleRows: [
-      { id: 1, usuario: 1, organizacion: 1, telefono: '3005551234', estado: 'ACTIVO' }
+      { id: 1, usuario: 1, nombre_completo: 'Admin Riego', username: 'admin', email: 'admin@agrosmart.local', organizacion: 1, telefono: '3005551234', estado: 'ACTIVO' }
     ]
   },
   {
