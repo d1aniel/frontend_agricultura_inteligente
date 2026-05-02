@@ -14,7 +14,17 @@
       <label [class.checkbox-field]="field.type === 'checkbox'">
         <span>{{ field.label }}</span>
 
-        @if (field.type === 'select') {
+        @if (field.relation) {
+          <div class="relation-control">
+            <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
+              <option value="">Seleccionar</option>
+              @for (row of rowsFor(field); track $index) {
+                <option [value]="optionValue(field, row)">{{ optionLabel(field, row) }}</option>
+              }
+            </select>
+            <a class="add-related" [routerLink]="createRoute(field)" [title]="'Crear ' + field.label">+</a>
+          </div>
+        } @else if (field.type === 'select') {
           <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
             <option value="">Seleccionar</option>
             @for (option of field.options ?? []; track option) {

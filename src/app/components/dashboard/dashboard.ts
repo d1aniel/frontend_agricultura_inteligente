@@ -39,7 +39,7 @@ export class Dashboard {
 
     request.subscribe({
       next: () => this.commandStatus.set(`Comando manual ${command.toLowerCase()} ejecutado`),
-      error: () => this.commandStatus.set(`Endpoint listo: /api/comandos-riego/${command === 'Encendido' ? 'activar' : 'desactivar'}-manual/`)
+      error: () => this.commandStatus.set(`Endpoint listo: /api_riego/comandos-riego/${command === 'Encendido' ? 'activar' : 'desactivar'}-manual/`)
     });
   }
 

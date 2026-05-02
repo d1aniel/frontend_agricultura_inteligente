@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AdminEntity, findAdminEntity } from '../../../models/admin.models';
+import { AdminEntity, AdminField, findAdminEntity } from '../../../models/admin.models';
 import { AdminApiService, AdminPayload } from '../../../services/admin-api.service';
 
 @Component({
@@ -13,6 +13,7 @@ import { AdminApiService, AdminPayload } from '../../../services/admin-api.servi
 export class Create {
   protected readonly entity = signal<AdminEntity>(findAdminEntity(undefined));
   protected readonly payload: AdminPayload = {};
+  protected readonly relationOptions = signal<Record<string, AdminPayload[]>>({});
   protected readonly message = signal('');
 
   constructor(
@@ -23,6 +24,7 @@ export class Create {
     this.route.data.subscribe((data) => {
       this.entity.set(findAdminEntity(data['entityKey']));
       this.resetPayload();
+      this.loadRelationOptions();
     });
   }
 
@@ -30,10 +32,33 @@ export class Create {
     const entity = this.entity();
     this.message.set('Guardando registro...');
 
-    this.api.create(entity, this.payload).subscribe({
+    this.api.create(entity, this.cleanPayload()).subscribe({
       next: () => this.router.navigate(['/', entity.route]),
-      error: () => this.message.set(`Formulario listo. Endpoint esperado: POST /api/${entity.endpoint}/`)
+      error: () => this.message.set(`Formulario listo. Endpoint esperado: POST /${entity.apiBasePath}/${entity.endpoint}/`)
     });
+  }
+
+  protected rowsFor(field: AdminField): AdminPayload[] {
+    return field.relation ? this.relationOptions()[field.key] ?? [] : [];
+  }
+
+  protected optionValue(field: AdminField, row: AdminPayload): string | number | boolean | null {
+    const valueField = field.relation?.valueField ?? findAdminEntity(field.relation?.entityKey).idField;
+    return row[valueField] ?? row['id'] ?? '';
+  }
+
+  protected optionLabel(field: AdminField, row: AdminPayload): string {
+    const labelFields = field.relation?.labelFields ?? ['nombre'];
+    const label = labelFields
+      .map((key) => row[key])
+      .filter((value) => value !== undefined && value !== null && value !== '')
+      .join(' - ');
+
+    return label || `${field.label} #${this.optionValue(field, row)}`;
+  }
+
+  protected createRoute(field: AdminField): string[] {
+    return ['/', field.relation?.createRoute ?? findAdminEntity(field.relation?.entityKey).route, 'create'];
   }
 
   private resetPayload(): void {
@@ -41,5 +66,37 @@ export class Create {
     this.entity().fields.forEach((field) => {
       this.payload[field.key] = field.type === 'checkbox' ? false : '';
     });
+  }
+
+  private loadRelationOptions(): void {
+    this.relationOptions.set({});
+
+    this.entity().fields
+      .filter((field) => field.relation)
+      .forEach((field) => {
+        const relatedEntity = findAdminEntity(field.relation?.entityKey);
+
+        this.api.getAll(relatedEntity).subscribe({
+          next: (rows) => this.mergeRelationOptions(field.key, rows),
+          error: () => this.mergeRelationOptions(field.key, relatedEntity.sampleRows)
+        });
+      });
+  }
+
+  private mergeRelationOptions(key: string, rows: AdminPayload[]): void {
+    this.relationOptions.update((current) => ({ ...current, [key]: rows }));
+  }
+
+  private cleanPayload(): AdminPayload {
+    const cleaned: AdminPayload = {};
+
+    this.entity().fields.forEach((field) => {
+      const value = this.payload[field.key];
+      cleaned[field.key] = value === '' && (field.relation || field.type === 'number' || field.type === 'date' || field.type === 'datetime-local')
+        ? null
+        : value;
+    });
+
+    return cleaned;
   }
 }

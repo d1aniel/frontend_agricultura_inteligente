@@ -10,8 +10,6 @@ export type AdminPayload = Record<string, string | number | boolean | null>;
   providedIn: 'root'
 })
 export class AdminApiService {
-  private readonly apiUrl = `${environment.apiUrl}/api`;
-
   constructor(private readonly http: HttpClient) {}
 
   getAll(entity: AdminEntity): Observable<AdminPayload[]> {
@@ -35,18 +33,18 @@ export class AdminApiService {
   }
 
   activarRiegoManual(actuadorId: number): Observable<AdminPayload> {
-    return this.http.post<AdminPayload>(`${this.apiUrl}/comandos-riego/activar-manual/`, {
+    return this.http.post<AdminPayload>(`${environment.apiUrl}/api_riego/comandos-riego/activar-manual/`, {
       actuador_id: actuadorId
     });
   }
 
   desactivarRiegoManual(actuadorId: number): Observable<AdminPayload> {
-    return this.http.post<AdminPayload>(`${this.apiUrl}/comandos-riego/desactivar-manual/`, {
+    return this.http.post<AdminPayload>(`${environment.apiUrl}/api_riego/comandos-riego/desactivar-manual/`, {
       actuador_id: actuadorId
     });
   }
 
   private url(entity: AdminEntity): string {
-    return `${this.apiUrl}/${entity.endpoint}/`;
+    return `${environment.apiUrl}/${entity.apiBasePath}/${entity.endpoint}/`;
   }
 }

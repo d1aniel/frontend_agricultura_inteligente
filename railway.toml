@@ -1,2 +1,2 @@
 [deploy]
-startCommand = "npx serve -s dist/frontend/browser -l $PORT"
+startCommand = "npm run start"
