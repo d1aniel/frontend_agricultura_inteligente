@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ADMIN_ENTITIES, AdminEntity } from '../../../models/admin.models';
+import { AuthService } from '../../../services/auth.service';
 
 interface AsideGroup {
   label: string;
@@ -23,13 +24,22 @@ const APP_LABELS: Record<AdminEntity['app'], string> = {
   styleUrl: './aside.css'
 })
 export class Aside {
-  protected readonly groups: AsideGroup[] = Object.entries(
-    ADMIN_ENTITIES.reduce<Record<string, AdminEntity[]>>((groups, entity) => {
-      groups[entity.app] = [...(groups[entity.app] ?? []), entity];
-      return groups;
-    }, {})
-  ).map(([app, items]) => ({
-    label: APP_LABELS[app as AdminEntity['app']],
-    items
-  }));
+  protected readonly groups = computed<AsideGroup[]>(() => {
+    const canSeeAdministrativeModules = this.auth.hasAdministrativeRole;
+    const visibleEntities = ADMIN_ENTITIES.filter((entity) =>
+      !entity.requiresAdministrativeRole || canSeeAdministrativeModules
+    );
+
+    return Object.entries(
+      visibleEntities.reduce<Record<string, AdminEntity[]>>((groups, entity) => {
+        groups[entity.app] = [...(groups[entity.app] ?? []), entity];
+        return groups;
+      }, {})
+    ).map(([app, items]) => ({
+      label: APP_LABELS[app as AdminEntity['app']],
+      items
+    }));
+  });
+
+  constructor(private readonly auth: AuthService) {}
 }

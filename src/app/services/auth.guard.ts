@@ -23,3 +23,14 @@ export const guestGuard: CanActivateFn = () => {
 
   return router.createUrlTree(['/']);
 };
+
+export const administrativeRoleGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (auth.hasAdministrativeRole) {
+    return true;
+  }
+
+  return router.createUrlTree(['/']);
+};

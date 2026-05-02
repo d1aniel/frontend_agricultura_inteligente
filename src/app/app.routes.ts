@@ -7,7 +7,7 @@ import { Getall } from './components/crud/getall/getall';
 import { Update } from './components/crud/update/update';
 import { Dashboard } from './components/dashboard/dashboard';
 import { ADMIN_ENTITIES } from './models/admin.models';
-import { authGuard, guestGuard } from './services/auth.guard';
+import { administrativeRoleGuard, authGuard, guestGuard } from './services/auth.guard';
 
 const crudRoutes: Routes = ADMIN_ENTITIES.flatMap((entity) => [
   {
@@ -36,6 +36,11 @@ export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard], title: 'Iniciar sesion' },
   { path: 'registro', component: Register, canActivate: [guestGuard], title: 'Crear cuenta' },
   { path: '', component: Dashboard, canActivate: [authGuard], title: 'Panel general' },
-  ...crudRoutes.map((route) => ({ ...route, canActivate: [authGuard] })),
+  ...crudRoutes.map((route) => ({
+    ...route,
+    canActivate: route.data?.['entityKey'] && ADMIN_ENTITIES.find((entity) => entity.key === route.data?.['entityKey'])?.requiresAdministrativeRole
+      ? [authGuard, administrativeRoleGuard]
+      : [authGuard]
+  })),
   { path: '**', redirectTo: '' }
 ];

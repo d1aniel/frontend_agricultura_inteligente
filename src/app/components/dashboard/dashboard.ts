@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ADMIN_ENTITIES } from '../../models/admin.models';
 import { AdminApiService } from '../../services/admin-api.service';
+import { AuthService } from '../../services/auth.service';
 
 type IrrigationState = 'Encendido' | 'Apagado';
 
@@ -12,7 +13,9 @@ type IrrigationState = 'Encendido' | 'Apagado';
   styleUrl: './dashboard.css'
 })
 export class Dashboard {
-  protected readonly entities = ADMIN_ENTITIES;
+  protected readonly entities = computed(() =>
+    ADMIN_ENTITIES.filter((entity) => !entity.requiresAdministrativeRole || this.auth.hasAdministrativeRole)
+  );
   protected readonly irrigationState = signal<IrrigationState>('Apagado');
   protected readonly commandStatus = signal('Sin comandos pendientes');
 
@@ -29,7 +32,10 @@ export class Dashboard {
     { type: 'Falla rele', severity: 'Critica', source: 'ACT-RELE-02', message: 'Respuesta de comando con codigo de error', time: 'Ayer 17:40' }
   ];
 
-  constructor(private readonly api: AdminApiService) {}
+  constructor(
+    private readonly api: AdminApiService,
+    private readonly auth: AuthService
+  ) {}
 
   protected sendIrrigationCommand(command: IrrigationState): void {
     const request = command === 'Encendido' ? this.api.activarRiegoManual(1) : this.api.desactivarRiegoManual(1);

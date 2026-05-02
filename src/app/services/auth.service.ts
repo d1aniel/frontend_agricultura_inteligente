@@ -39,6 +39,20 @@ export class AuthService {
     return this.userSubject.value;
   }
 
+  get hasAdministrativeRole(): boolean {
+    const user = this.currentUser;
+
+    if (!user) {
+      return false;
+    }
+
+    if (user.es_administrador_o_auditor === true) {
+      return true;
+    }
+
+    return (user.roles ?? []).some((role) => ['administrador', 'admin', 'auditor'].includes(role.toLowerCase()));
+  }
+
   register(payload: RegisterPayload): Observable<AuthTokenResponse> {
     return this.http.post<AuthTokenResponse>(`${this.authUrl}/registro/`, payload).pipe(
       tap((response) => this.saveSession(response)),

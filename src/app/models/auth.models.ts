@@ -6,6 +6,8 @@ export interface AuthUser {
   last_name: string;
   nombre_completo: string;
   is_active: boolean;
+  roles?: string[];
+  es_administrador_o_auditor?: boolean;
 }
 
 export interface RegisterPayload {

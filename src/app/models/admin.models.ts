@@ -25,6 +25,7 @@ export interface AdminEntity {
   pluralLabel: string;
   app: 'usuarios' | 'ubicaciones' | 'iot' | 'riego' | 'sistema';
   idField: string;
+  requiresAdministrativeRole?: boolean;
   fields: AdminField[];
   sampleRows: Record<string, string | number | boolean>[];
 }
@@ -34,12 +35,12 @@ const estadoBasico = ['ACTIVO', 'INACTIVO'];
 const usuarioRelation: AdminRelation = {
   entityKey: 'usuario',
   valueField: 'usuario',
-  labelFields: ['usuario', 'telefono', 'estado'],
+  labelFields: ['nombre_completo', 'username', 'telefono'],
   createRoute: 'usuarios'
 };
 const usuarioPerfilRelation: AdminRelation = {
   entityKey: 'usuario',
-  labelFields: ['usuario', 'telefono', 'estado'],
+  labelFields: ['nombre_completo', 'username', 'telefono'],
   createRoute: 'usuarios'
 };
 
@@ -297,6 +298,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     pluralLabel: 'Usuarios',
     app: 'usuarios',
     idField: 'id',
+    requiresAdministrativeRole: true,
     fields: [
       { key: 'usuario', label: 'Usuario auth', type: 'number', required: true },
       { key: 'organizacion', label: 'Organizacion', type: 'select', relation: { entityKey: 'organizacion', labelFields: ['nombre', 'nit_documento'], createRoute: 'organizaciones' } },
@@ -316,6 +318,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     pluralLabel: 'Roles',
     app: 'usuarios',
     idField: 'id',
+    requiresAdministrativeRole: true,
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
       { key: 'descripcion', label: 'Descripcion', type: 'textarea' },
@@ -334,6 +337,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     pluralLabel: 'Usuarios roles',
     app: 'usuarios',
     idField: 'id',
+    requiresAdministrativeRole: true,
     fields: [
       { key: 'usuario', label: 'Usuario', type: 'select', required: true, relation: usuarioPerfilRelation },
       { key: 'rol', label: 'Rol', type: 'select', required: true, relation: { entityKey: 'rol', labelFields: ['nombre'], createRoute: 'roles' } },
@@ -353,6 +357,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     pluralLabel: 'Alertas del sistema',
     app: 'sistema',
     idField: 'id',
+    requiresAdministrativeRole: true,
     fields: [
       { key: 'nodo', label: 'Nodo', type: 'select', relation: { entityKey: 'nodo_iot', labelFields: ['nombre', 'codigo_nodo'], createRoute: 'nodos-iot' } },
       { key: 'sensor', label: 'Sensor', type: 'select', relation: { entityKey: 'sensor', labelFields: ['nombre', 'tipo_sensor'], createRoute: 'sensores' } },
@@ -377,6 +382,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     pluralLabel: 'Auditorias del sistema',
     app: 'sistema',
     idField: 'id',
+    requiresAdministrativeRole: true,
     fields: [
       { key: 'usuario', label: 'Usuario', type: 'select', relation: usuarioPerfilRelation },
       { key: 'tabla_afectada', label: 'Tabla afectada', type: 'text', required: true },

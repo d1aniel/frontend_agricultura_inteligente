@@ -13,7 +13,7 @@
     Panel general
   </a>
 
-  @for (group of groups; track group.label) {
+  @for (group of groups(); track group.label) {
     <p class="nav-group">{{ group.label }}</p>
 
     @for (item of group.items; track item.key) {
