@@ -1,5 +1,5 @@
 .auth-page {
-  min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -48,7 +48,8 @@ p {
 
 h1 {
   color: #14251a;
-  font-size: 30px;
+  font-size: 28px;
+  line-height: 1.12;
 }
 
 small {
@@ -96,4 +97,27 @@ a {
   color: #1f6b3f;
   font-weight: 800;
   text-decoration: none;
+}
+
+@media (max-width: 520px) {
+  .auth-page {
+    align-items: stretch;
+    padding: 12px;
+  }
+
+  .auth-panel {
+    align-self: center;
+    gap: 18px;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  footer {
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
 }

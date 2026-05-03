@@ -1,7 +1,7 @@
 .crud-page {
   display: grid;
-  gap: 18px;
-  padding: 22px;
+  gap: 16px;
+  padding: 18px;
   border: 1px solid #dce5df;
   border-radius: 8px;
   background: #ffffff;
@@ -13,6 +13,7 @@
   justify-content: space-between;
   gap: 16px;
   align-items: end;
+  flex-wrap: wrap;
 }
 
 h2,
@@ -122,5 +123,25 @@ button.primary-action {
     grid-template-columns: 1fr;
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .crud-page {
+    padding: 14px;
+  }
+
+  .primary-action,
+  .secondary-action,
+  button.primary-action {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .relation-control {
+    grid-template-columns: 1fr;
+  }
+
+  .add-related {
+    min-height: 38px;
   }
 }

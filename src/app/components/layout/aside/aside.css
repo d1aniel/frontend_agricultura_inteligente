@@ -58,3 +58,40 @@
   background: #20382a;
   color: #ffffff;
 }
+
+@media (max-width: 1050px) {
+  .brand {
+    margin-bottom: 12px;
+  }
+
+  .nav-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .brand-link {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand strong {
+    font-size: 14px;
+  }
+
+  .brand small {
+    font-size: 11px;
+  }
+}

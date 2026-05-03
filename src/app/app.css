@@ -4,7 +4,7 @@
 }
 
 .app-shell {
-  min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   background: #eef3ef;
@@ -17,7 +17,7 @@
   padding: 18px 14px;
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100svh;
   overflow-y: auto;
 }
 
@@ -31,6 +31,8 @@
   display: grid;
   gap: 16px;
   padding: 18px 22px;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 1050px) {
@@ -41,11 +43,19 @@
   .sidebar {
     position: static;
     height: auto;
+    padding: 14px;
   }
 }
 
 @media (max-width: 720px) {
   .content {
-    padding: 18px;
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .content {
+    padding: 10px;
   }
 }

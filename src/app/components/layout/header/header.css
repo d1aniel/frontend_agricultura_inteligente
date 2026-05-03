@@ -20,7 +20,8 @@ p {
 }
 
 h1 {
-  font-size: 28px;
+  font-size: 26px;
+  line-height: 1.15;
 }
 
 .user-area {
@@ -65,11 +66,23 @@ h1 {
   .topbar {
     align-items: stretch;
     flex-direction: column;
-    padding: 18px;
+    gap: 12px;
+    padding: 14px;
   }
 
   .user-area {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 420px) {
+  .user-chip,
+  .logout-button {
+    width: 100%;
   }
 }
