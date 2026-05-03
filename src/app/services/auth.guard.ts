@@ -34,3 +34,14 @@ export const administrativeRoleGuard: CanActivateFn = () => {
 
   return router.createUrlTree(['/']);
 };
+
+export const activeRoleGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (auth.hasActiveRole) {
+    return true;
+  }
+
+  return router.createUrlTree(['/']);
+};

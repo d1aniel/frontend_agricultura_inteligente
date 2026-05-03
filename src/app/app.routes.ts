@@ -7,7 +7,7 @@ import { Getall } from './components/crud/getall/getall';
 import { Update } from './components/crud/update/update';
 import { Dashboard } from './components/dashboard/dashboard';
 import { ADMIN_ENTITIES } from './models/admin.models';
-import { administrativeRoleGuard, authGuard, guestGuard } from './services/auth.guard';
+import { activeRoleGuard, administrativeRoleGuard, authGuard, guestGuard } from './services/auth.guard';
 
 const crudRoutes: Routes = ADMIN_ENTITIES
   .filter((entity) => entity.hideFromRoutes !== true)
@@ -41,8 +41,8 @@ export const routes: Routes = [
   ...crudRoutes.map((route) => ({
     ...route,
     canActivate: route.data?.['entityKey'] && ADMIN_ENTITIES.find((entity) => entity.key === route.data?.['entityKey'])?.requiresAdministrativeRole
-      ? [authGuard, administrativeRoleGuard]
-      : [authGuard]
+      ? [authGuard, activeRoleGuard, administrativeRoleGuard]
+      : [authGuard, activeRoleGuard]
   })),
   { path: '**', redirectTo: '' }
 ];

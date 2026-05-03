@@ -14,12 +14,8 @@
   </a>
 
   @for (group of groups(); track group.label) {
-    <p class="nav-group">{{ group.label }}</p>
-
-    @for (item of group.items; track item.key) {
-      <a class="nav-item" [routerLink]="['/', item.route]" routerLinkActive="nav-item-active">
-        {{ item.pluralLabel }}
-      </a>
-    }
+    <a class="nav-item" [routerLink]="['/', group.items[0].route]" routerLinkActive="nav-item-active">
+      {{ group.label }}
+    </a>
   }
 </nav>

@@ -10,6 +10,12 @@
   </header>
 
   <div class="toolbar">
+    <nav class="entity-tabs" aria-label="Modelos de la aplicacion">
+      @for (item of appEntities(); track item.key) {
+        <a [routerLink]="['/', item.route]" routerLinkActive="entity-tab-active">{{ item.pluralLabel }}</a>
+      }
+    </nav>
+
     <label>
       Buscar
       <input

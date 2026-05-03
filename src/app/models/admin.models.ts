@@ -371,11 +371,11 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     fields: [
       { key: 'usuario', label: 'Usuario', type: 'select', required: true, relation: usuarioPerfilRelation },
       { key: 'rol', label: 'Rol', type: 'select', required: true, relation: { entityKey: 'rol', labelFields: ['nombre'], createRoute: 'roles' } },
-      { key: 'asignado_por', label: 'Asignado por', type: 'select', relation: usuarioPerfilRelation },
+      { key: 'asignado_por_nombre', label: 'Asignado por', type: 'text', hideInForm: true },
       { key: 'estado', label: 'Estado', type: 'select', options: estadoBasico }
     ],
     sampleRows: [
-      { id: 1, usuario: 1, rol: 1, asignado_por: 1, estado: 'ACTIVO' }
+      { id: 1, usuario: 1, rol: 1, asignado_por_nombre: 'Admin Riego', estado: 'ACTIVO' }
     ]
   },
   {

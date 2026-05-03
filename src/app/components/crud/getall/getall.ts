@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AdminEntity, AdminField, findAdminEntity } from '../../../models/admin.models';
+import { ADMIN_ENTITIES, AdminEntity, AdminField, findAdminEntity } from '../../../models/admin.models';
 import { AdminApiService, AdminPayload } from '../../../services/admin-api.service';
 
 @Component({
@@ -17,6 +17,9 @@ export class Getall {
   protected readonly search = signal('');
   protected readonly message = signal('Cargando datos desde el API...');
   protected readonly visibleFields = computed(() => this.entity().fields.filter((field) => field.hideInList !== true).slice(0, 5));
+  protected readonly appEntities = computed(() =>
+    ADMIN_ENTITIES.filter((entity) => entity.app === this.entity().app && entity.hideFromNavigation !== true)
+  );
   protected readonly filteredRows = computed(() => {
     const term = this.search().trim().toLowerCase();
     if (!term) {

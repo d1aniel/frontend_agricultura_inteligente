@@ -26,8 +26,11 @@ const APP_LABELS: Record<AdminEntity['app'], string> = {
 export class Aside {
   protected readonly groups = computed<AsideGroup[]>(() => {
     const canSeeAdministrativeModules = this.auth.hasAdministrativeRole;
+    const canSeeOperationalModules = this.auth.hasActiveRole;
     const visibleEntities = ADMIN_ENTITIES.filter((entity) =>
-      entity.hideFromNavigation !== true && (!entity.requiresAdministrativeRole || canSeeAdministrativeModules)
+      entity.hideFromNavigation !== true
+      && canSeeOperationalModules
+      && (!entity.requiresAdministrativeRole || canSeeAdministrativeModules)
     );
 
     return Object.entries(

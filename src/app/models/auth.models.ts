@@ -7,6 +7,7 @@ export interface AuthUser {
   nombre_completo: string;
   is_active: boolean;
   roles?: string[];
+  tiene_rol_activo?: boolean;
   es_administrador_o_auditor?: boolean;
 }
 

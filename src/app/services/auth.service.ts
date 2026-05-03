@@ -53,6 +53,16 @@ export class AuthService {
     return (user.roles ?? []).some((role) => ['administrador', 'admin', 'auditor'].includes(role.toLowerCase()));
   }
 
+  get hasActiveRole(): boolean {
+    const user = this.currentUser;
+
+    if (!user) {
+      return false;
+    }
+
+    return user.tiene_rol_activo === true || user.es_administrador_o_auditor === true || (user.roles ?? []).length > 0;
+  }
+
   register(payload: RegisterPayload): Observable<AuthTokenResponse> {
     return this.http.post<AuthTokenResponse>(`${this.authUrl}/registro/`, payload).pipe(
       tap((response) => this.saveSession(response)),
