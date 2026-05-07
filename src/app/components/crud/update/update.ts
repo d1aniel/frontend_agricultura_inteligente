@@ -112,6 +112,9 @@ export class Update {
 
     this.formFields().forEach((field) => {
       const value = this.payload[field.key];
+      if ((field.omitWhenEmpty || (field.type === 'select' && field.required !== true)) && value === '') {
+        return;
+      }
       cleaned[field.key] = value === '' && (field.relation || field.type === 'number' || field.type === 'date' || field.type === 'datetime-local')
         ? null
         : value;

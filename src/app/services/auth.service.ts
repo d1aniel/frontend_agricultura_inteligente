@@ -5,6 +5,8 @@ import { environment } from '../../environments/environment';
 import {
   AuthTokenResponse,
   AuthUser,
+  ChangeTemporaryPasswordPayload,
+  ForgotPasswordPayload,
   LoginPayload,
   RegisterPayload
 } from '../models/auth.models';
@@ -90,6 +92,16 @@ export class AuthService {
         console.error('Error loading current user:', error);
         return throwError(() => error);
       })
+    );
+  }
+
+  forgotPassword(payload: ForgotPasswordPayload): Observable<{ detail: string }> {
+    return this.http.post<{ detail: string }>(`${this.authUrl}/olvide-password/`, payload);
+  }
+
+  changeTemporaryPassword(payload: ChangeTemporaryPasswordPayload): Observable<{ detail: string; usuario: AuthUser }> {
+    return this.http.post<{ detail: string; usuario: AuthUser }>(`${this.authUrl}/cambiar-password-temporal/`, payload).pipe(
+      tap((response) => this.saveUser(response.usuario))
     );
   }
 

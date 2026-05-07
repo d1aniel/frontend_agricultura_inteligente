@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'number' | 'email' | 'date' | 'datetime-local' | 'checkbox' | 'textarea' | 'select';
+export type FieldType = 'text' | 'password' | 'number' | 'email' | 'date' | 'datetime-local' | 'checkbox' | 'textarea' | 'select';
 
 export interface AdminRelation {
   entityKey: string;
@@ -17,6 +17,7 @@ export interface AdminField {
   relation?: AdminRelation;
   hideInList?: boolean;
   hideInForm?: boolean;
+  omitWhenEmpty?: boolean;
 }
 
 export interface AdminEntity {
@@ -327,10 +328,14 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     idField: 'id',
     requiresAdministrativeRole: true,
     fields: [
+      { key: 'nuevo_username', label: 'Usuario', type: 'text', required: true, hideInList: true, omitWhenEmpty: true },
+      { key: 'nuevos_nombres', label: 'Nombres', type: 'text', required: true, hideInList: true, omitWhenEmpty: true },
+      { key: 'nuevos_apellidos', label: 'Apellidos', type: 'text', required: true, hideInList: true, omitWhenEmpty: true },
+      { key: 'nuevo_email', label: 'Correo', type: 'email', required: true, hideInList: true, omitWhenEmpty: true },
+      { key: 'password_temporal', label: 'Contrasena temporal', type: 'password', required: true, hideInList: true, omitWhenEmpty: true },
       { key: 'nombre_completo', label: 'Nombre', type: 'text', hideInForm: true },
       { key: 'username', label: 'Usuario', type: 'text', hideInForm: true },
       { key: 'email', label: 'Email', type: 'email', hideInForm: true },
-      { key: 'usuario', label: 'Usuario', type: 'select', required: true, hideInList: true, relation: { entityKey: 'auth_user', labelFields: ['nombre_completo', 'username', 'email'], allowCreate: false } },
       { key: 'organizacion', label: 'Organizacion', type: 'select', relation: { entityKey: 'organizacion', labelFields: ['nombre', 'nit_documento'], createRoute: 'organizaciones' } },
       { key: 'telefono', label: 'Telefono', type: 'text' },
       { key: 'estado', label: 'Estado', type: 'select', options: ['ACTIVO', 'INACTIVO', 'BLOQUEADO'] }

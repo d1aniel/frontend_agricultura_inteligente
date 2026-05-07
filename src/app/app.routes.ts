@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 import { Create } from './components/crud/create/create';
 import { Login } from './components/auth/login/login';
-import { Register } from './components/auth/register/register';
+import { ForgotPassword } from './components/auth/forgot-password/forgot-password';
+import { ChangeTemporaryPassword } from './components/auth/change-temporary-password/change-temporary-password';
 import { Delete } from './components/crud/delete/delete';
 import { Getall } from './components/crud/getall/getall';
 import { Update } from './components/crud/update/update';
@@ -36,7 +37,8 @@ const crudRoutes: Routes = ADMIN_ENTITIES
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard], title: 'Iniciar sesion' },
-  { path: 'registro', component: Register, canActivate: [guestGuard], title: 'Crear cuenta' },
+  { path: 'olvide-contrasena', component: ForgotPassword, canActivate: [guestGuard], title: 'Recuperar acceso' },
+  { path: 'cambiar-contrasena-temporal', component: ChangeTemporaryPassword, canActivate: [authGuard], title: 'Cambiar contrasena' },
   { path: '', component: Dashboard, canActivate: [authGuard], title: 'Panel general' },
   ...crudRoutes.map((route) => ({
     ...route,

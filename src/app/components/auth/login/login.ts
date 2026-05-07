@@ -30,7 +30,10 @@ export class Login {
     this.message.set('Validando credenciales...');
 
     this.auth.login(this.credentials).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: (response) => {
+        const route = response.usuario.requiere_cambio_password ? '/cambiar-contrasena-temporal' : '/';
+        this.router.navigate([route]);
+      },
       error: () => {
         this.loading.set(false);
         this.message.set('No se pudo iniciar sesion. Revisa usuario y contrasena.');

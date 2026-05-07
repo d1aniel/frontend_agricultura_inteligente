@@ -9,6 +9,7 @@ export interface AuthUser {
   roles?: string[];
   tiene_rol_activo?: boolean;
   es_administrador_o_auditor?: boolean;
+  requiere_cambio_password?: boolean;
 }
 
 export interface RegisterPayload {
@@ -30,4 +31,13 @@ export interface AuthTokenResponse {
   token: string;
   tipo: 'Token';
   usuario: AuthUser;
+}
+
+export interface ForgotPasswordPayload {
+  identificador: string;
+}
+
+export interface ChangeTemporaryPasswordPayload {
+  password_actual: string;
+  nueva_password: string;
 }
