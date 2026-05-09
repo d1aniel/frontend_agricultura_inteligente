@@ -51,14 +51,22 @@ h1 {
   font-weight: 800;
 }
 
+.account-link,
 .logout-button {
   min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #cfdcd4;
   border-radius: 8px;
   padding: 0 14px;
   background: #ffffff;
   color: #245a35;
   font-weight: 800;
+  text-decoration: none;
+}
+
+.logout-button {
   cursor: pointer;
 }
 
@@ -82,6 +90,7 @@ h1 {
 
 @media (max-width: 420px) {
   .user-chip,
+  .account-link,
   .logout-button {
     width: 100%;
   }

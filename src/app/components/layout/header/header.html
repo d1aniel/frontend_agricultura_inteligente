@@ -10,6 +10,7 @@
       <strong>{{ user?.nombre_completo || user?.username || 'Usuario' }}</strong>
     </div>
 
+    <a class="account-link" routerLink="/cambiar-contrasena">Restablecer contraseña</a>
     <button type="button" class="logout-button" (click)="logout()">Salir</button>
   </div>
 </header>
