@@ -6,7 +6,9 @@
       <small>{{ message() }}</small>
     </div>
 
-    <a class="primary-action" [routerLink]="['/', entity().route, 'create']">Nuevo registro</a>
+    @if (canManageRecords()) {
+      <a class="primary-action" [routerLink]="['/', entity().route, 'create']">Nuevo registro</a>
+    }
   </header>
 
   <div class="toolbar">
@@ -35,7 +37,9 @@
           @for (field of visibleFields(); track field.key) {
             <th>{{ field.label }}</th>
           }
-          <th>Acciones</th>
+          @if (canManageRecords()) {
+            <th>Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -45,10 +49,12 @@
             @for (field of visibleFields(); track field.key) {
               <td>{{ displayValue(row, field) }}</td>
             }
-            <td class="actions">
-              <a [routerLink]="['/', entity().route, 'update', value(row, entity().idField)]">Modificar</a>
-              <a class="danger" [routerLink]="['/', entity().route, 'delete', value(row, entity().idField)]">Eliminar</a>
-            </td>
+            @if (canManageRecords()) {
+              <td class="actions">
+                <a [routerLink]="['/', entity().route, 'update', value(row, entity().idField)]">Modificar</a>
+                <a class="danger" [routerLink]="['/', entity().route, 'delete', value(row, entity().idField)]">Eliminar</a>
+              </td>
+            }
           </tr>
         }
       </tbody>

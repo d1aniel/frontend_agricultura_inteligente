@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ADMIN_ENTITIES, AdminEntity, AdminField, findAdminEntity } from '../../../models/admin.models';
 import { AdminApiService, AdminPayload } from '../../../services/admin-api.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-getall',
@@ -17,6 +18,7 @@ export class Getall {
   protected readonly search = signal('');
   protected readonly message = signal('Cargando datos desde el API...');
   protected readonly visibleFields = computed(() => this.entity().fields.filter((field) => field.hideInList !== true).slice(0, 5));
+  protected readonly canManageRecords = computed(() => this.auth.hasAdministrativeRole);
   protected readonly appEntities = computed(() =>
     ADMIN_ENTITIES.filter((entity) => entity.app === this.entity().app && entity.hideFromNavigation !== true)
   );
@@ -33,7 +35,8 @@ export class Getall {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly api: AdminApiService
+    private readonly api: AdminApiService,
+    private readonly auth: AuthService
   ) {
     this.route.data.subscribe((data) => {
       this.entity.set(findAdminEntity(data['entityKey']));

@@ -42,7 +42,8 @@ export const routes: Routes = [
   { path: '', component: Dashboard, canActivate: [authGuard], title: 'Panel general' },
   ...crudRoutes.map((route) => ({
     ...route,
-    canActivate: route.data?.['entityKey'] && ADMIN_ENTITIES.find((entity) => entity.key === route.data?.['entityKey'])?.requiresAdministrativeRole
+    canActivate: route.data?.['action'] !== 'getall'
+      || (route.data?.['entityKey'] && ADMIN_ENTITIES.find((entity) => entity.key === route.data?.['entityKey'])?.requiresAdministrativeRole)
       ? [authGuard, activeRoleGuard, administrativeRoleGuard]
       : [authGuard, activeRoleGuard]
   })),
