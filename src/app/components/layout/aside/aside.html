@@ -13,6 +13,10 @@
     Panel general
   </a>
 
+  <a class="nav-item" routerLink="/cambiar-contrasena" routerLinkActive="nav-item-active">
+    Cambiar contrasena
+  </a>
+
   @for (group of groups(); track group.label) {
     <a class="nav-item" [routerLink]="['/', group.items[0].route]" routerLinkActive="nav-item-active">
       {{ group.label }}

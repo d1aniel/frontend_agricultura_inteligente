@@ -7,6 +7,7 @@ import { Delete } from './components/crud/delete/delete';
 import { Getall } from './components/crud/getall/getall';
 import { Update } from './components/crud/update/update';
 import { Dashboard } from './components/dashboard/dashboard';
+import { ChangePassword } from './components/profile/change-password/change-password';
 import { ADMIN_ENTITIES } from './models/admin.models';
 import { activeRoleGuard, administrativeRoleGuard, authGuard, guestGuard } from './services/auth.guard';
 
@@ -39,6 +40,7 @@ export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard], title: 'Iniciar sesion' },
   { path: 'olvide-contrasena', component: ForgotPassword, canActivate: [guestGuard], title: 'Recuperar acceso' },
   { path: 'cambiar-contrasena-temporal', component: ChangeTemporaryPassword, canActivate: [authGuard], title: 'Cambiar contrasena' },
+  { path: 'cambiar-contrasena', component: ChangePassword, canActivate: [authGuard], title: 'Cambiar contrasena' },
   { path: '', component: Dashboard, canActivate: [authGuard], title: 'Panel general' },
   ...crudRoutes.map((route) => ({
     ...route,
