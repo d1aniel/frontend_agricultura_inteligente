@@ -180,6 +180,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     pluralLabel: 'Lecturas de sensores',
     app: 'iot',
     idField: 'id',
+    hideFromNavigation: true,
     fields: [
       { key: 'sensor', label: 'Sensor', type: 'select', required: true, relation: { entityKey: 'sensor', labelFields: ['nombre', 'tipo_sensor'], createRoute: 'sensores' } },
       { key: 'valor', label: 'Valor', type: 'number', required: true },

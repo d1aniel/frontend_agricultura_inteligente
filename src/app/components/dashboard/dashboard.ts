@@ -177,6 +177,7 @@ export class Dashboard implements OnDestroy {
       next: (lecturas) => {
         const readings = lecturas
           .filter((lectura) => String(lectura['sensor']) === sensorId)
+          .filter((lectura) => this.isMqttReading(lectura))
           .sort((a, b) => this.timestamp(b) - this.timestamp(a));
         const latest = readings[0];
         const sensor = this.soilSensors().find((item) => String(item['id']) === sensorId);
@@ -184,8 +185,8 @@ export class Dashboard implements OnDestroy {
         if (!latest) {
           this.humidityMetric.set({
             label: 'Humedad suelo',
-            value: 'Sin lectura',
-            detail: `${sensor?.['nombre'] ?? 'Sensor seleccionado'} aun no reporta datos`,
+            value: 'Esperando ESP32',
+            detail: `${sensor?.['nombre'] ?? 'Sensor seleccionado'} aun no reporta lecturas MQTT`,
             status: 'warn'
           });
           return;
@@ -297,6 +298,10 @@ export class Dashboard implements OnDestroy {
     }
     const date = Date.parse(String(value ?? ''));
     return Number.isNaN(date) ? 0 : date;
+  }
+
+  private isMqttReading(row: AdminPayload): boolean {
+    return String(row['observacion'] ?? '').toLowerCase().includes('mqtt');
   }
 
   private humidityStatus(value: AdminPayload[string]): DashboardMetric['status'] {
