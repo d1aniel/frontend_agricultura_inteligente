@@ -1,4 +1,5 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, OnDestroy, computed, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ADMIN_ENTITIES, AdminEntity } from '../../models/admin.models';
 import { AdminApiService, AdminPayload } from '../../services/admin-api.service';
@@ -23,11 +24,11 @@ interface DashboardAlert {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard {
+export class Dashboard implements OnDestroy {
   protected readonly entities = computed(() =>
     ADMIN_ENTITIES.filter((entity) =>
       entity.hideFromNavigation !== true
@@ -42,10 +43,19 @@ export class Dashboard {
   protected readonly actuatorId = signal<number | null>(null);
   protected readonly sensorsLoaded = signal(false);
   protected readonly hasSoilSensor = signal(false);
-  protected readonly metrics = signal<DashboardMetric[]>([]);
+  protected readonly soilSensors = signal<AdminPayload[]>([]);
+  protected readonly selectedSensorId = signal<string>('');
   protected readonly alerts = signal<DashboardAlert[]>([]);
   protected readonly alertsStatus = signal('Cargando alertas...');
   protected readonly sensorStatus = signal('Cargando sensores asociados...');
+  protected readonly metrics = computed(() =>
+    [this.humidityMetric(), this.nodeMetric(), this.alertMetric()].filter((metric): metric is DashboardMetric => Boolean(metric))
+  );
+
+  private readonly humidityMetric = signal<DashboardMetric | null>(null);
+  private readonly nodeMetric = signal<DashboardMetric | null>(null);
+  private readonly alertMetric = signal<DashboardMetric | null>(null);
+  private refreshTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private readonly api: AdminApiService,
@@ -53,6 +63,25 @@ export class Dashboard {
   ) {
     this.loadDashboardData();
     this.loadActuator();
+    this.refreshTimer = setInterval(() => this.refreshSelectedSensorData(), 6000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+    }
+  }
+
+  protected onSensorChange(sensorId: string): void {
+    this.selectedSensorId.set(sensorId);
+    this.refreshSelectedSensorData();
+  }
+
+  protected sensorLabel(sensor: AdminPayload): string {
+    const parts = [sensor['nombre'], sensor['finca_nombre'], sensor['parcela_nombre'], sensor['codigo_nodo'] ?? sensor['nodo']]
+      .filter((value) => value !== undefined && value !== null && value !== '')
+      .map((value) => String(value));
+    return parts.join(' - ') || `Sensor ${sensor['id']}`;
   }
 
   protected sendIrrigationCommand(command: IrrigationState): void {
@@ -96,96 +125,108 @@ export class Dashboard {
     this.api.getAll(sensorEntity).subscribe({
       next: (sensors) => {
         const soilSensors = sensors.filter((sensor) => sensor['tipo_sensor'] === 'HUMEDAD_SUELO');
+        this.soilSensors.set(soilSensors);
         this.hasSoilSensor.set(soilSensors.length > 0);
         this.sensorsLoaded.set(true);
 
         if (soilSensors.length === 0) {
           this.sensorStatus.set('No tienes sensores de humedad de suelo asociados.');
-          this.metrics.set([]);
+          this.humidityMetric.set(null);
+          this.nodeMetric.set(null);
+          this.alertMetric.set(null);
           this.alerts.set([]);
           this.alertsStatus.set('Las alertas se muestran cuando existe un sensor asociado.');
           return;
         }
 
-        this.sensorStatus.set('Sensor de humedad de suelo asociado.');
-        this.loadMetrics(soilSensors);
+        if (!this.selectedSensorId()) {
+          this.selectedSensorId.set(String(soilSensors[0]['id']));
+        }
+
+        this.sensorStatus.set(this.auth.hasAdministrativeRole
+          ? 'Selecciona el sensor de la finca que quieres monitorear.'
+          : 'Mostrando sensores de humedad asociados a tu usuario.');
+        this.loadNodeMetric();
+        this.refreshSelectedSensorData();
         this.loadAlerts();
       },
       error: () => {
         this.sensorsLoaded.set(true);
         this.hasSoilSensor.set(false);
         this.sensorStatus.set('No fue posible consultar sensores asociados.');
-        this.metrics.set([]);
+        this.humidityMetric.set(null);
       }
     });
   }
 
-  private loadMetrics(soilSensors: AdminPayload[]): void {
+  private refreshSelectedSensorData(): void {
+    if (!this.hasSoilSensor() || !this.selectedSensorId()) {
+      return;
+    }
+    this.loadLatestReading(this.selectedSensorId());
+    this.loadAlerts();
+  }
+
+  private loadLatestReading(sensorId: string): void {
     const lecturaEntity = this.entity('lectura_sensor');
-    const nodoEntity = this.entity('nodo_iot');
     if (!lecturaEntity) {
       return;
     }
 
     this.api.getAll(lecturaEntity).subscribe({
       next: (lecturas) => {
-        const soilSensorIds = new Set(soilSensors.map((sensor) => String(sensor['id'])));
-        const soilReadings = lecturas
-          .filter((lectura) => soilSensorIds.has(String(lectura['sensor'])))
+        const readings = lecturas
+          .filter((lectura) => String(lectura['sensor']) === sensorId)
           .sort((a, b) => this.timestamp(b) - this.timestamp(a));
-        const latest = soilReadings[0];
+        const latest = readings[0];
+        const sensor = this.soilSensors().find((item) => String(item['id']) === sensorId);
 
         if (!latest) {
-          this.metrics.set([
-            {
-              label: 'Humedad suelo',
-              value: 'Sin lectura',
-              detail: 'El sensor asociado aun no reporta datos',
-              status: 'warn'
-            }
-          ]);
+          this.humidityMetric.set({
+            label: 'Humedad suelo',
+            value: 'Sin lectura',
+            detail: `${sensor?.['nombre'] ?? 'Sensor seleccionado'} aun no reporta datos`,
+            status: 'warn'
+          });
           return;
         }
 
-        const sensor = soilSensors.find((item) => String(item['id']) === String(latest['sensor']));
-        this.metrics.set([
-          {
-            label: 'Humedad suelo',
-            value: `${latest['valor'] ?? '--'}${latest['unidad_medida'] ?? '%'}`,
-            detail: `${sensor?.['nombre'] ?? 'Sensor de humedad'} - ${latest['calidad_dato'] ?? 'lectura registrada'}`,
-            status: this.humidityStatus(latest['valor'])
-          }
-        ]);
+        this.humidityMetric.set({
+          label: 'Humedad suelo',
+          value: `${latest['valor'] ?? '--'}${latest['unidad_medida'] ?? '%'}`,
+          detail: `${sensor?.['nombre'] ?? 'Sensor de humedad'} - ${this.formatDate(latest['fecha_hora'] ?? latest['id'])}`,
+          status: this.humidityStatus(latest['valor'])
+        });
       },
       error: () => {
-        this.metrics.set([
-          {
-            label: 'Humedad suelo',
-            value: 'Sin lectura',
-            detail: 'No fue posible consultar lecturas del sensor',
-            status: 'warn'
-          }
-        ]);
+        this.humidityMetric.set({
+          label: 'Humedad suelo',
+          value: 'Sin lectura',
+          detail: 'No fue posible consultar lecturas del sensor',
+          status: 'warn'
+        });
       }
     });
+  }
 
-    if (nodoEntity) {
-      this.api.getAll(nodoEntity).subscribe({
-        next: (nodos) => {
-          const active = nodos.filter((nodo) => nodo['estado'] === 'ACTIVO').length;
-          const total = nodos.length;
-          this.metrics.update((current) => [
-            ...current,
-            {
-              label: 'Nodos asociados',
-              value: `${active}/${total}`,
-              detail: total > 0 ? 'Nodos IoT visibles para este usuario' : 'No hay nodos asociados',
-              status: total > 0 && active === 0 ? 'warn' : 'ok'
-            }
-          ]);
-        }
-      });
+  private loadNodeMetric(): void {
+    const nodoEntity = this.entity('nodo_iot');
+    if (!nodoEntity) {
+      return;
     }
+
+    this.api.getAll(nodoEntity).subscribe({
+      next: (nodos) => {
+        const active = nodos.filter((nodo) => nodo['estado'] === 'ACTIVO').length;
+        const total = nodos.length;
+        this.nodeMetric.set({
+          label: 'Nodos asociados',
+          value: `${active}/${total}`,
+          detail: total > 0 ? 'Nodos IoT visibles para este usuario' : 'No hay nodos asociados',
+          status: total > 0 && active === 0 ? 'warn' : 'ok'
+        });
+      }
+    });
   }
 
   private loadAlerts(): void {
@@ -212,15 +253,12 @@ export class Dashboard {
           time: this.formatDate(alerta['fecha_creacion'] ?? alerta['created_at'] ?? alerta['id'])
         })));
         this.alertsStatus.set(abiertas.length > 0 ? '' : 'No hay alertas abiertas.');
-        this.metrics.update((current) => [
-          ...current,
-          {
-            label: 'Alertas abiertas',
-            value: String(abiertas.length),
-            detail: `${abiertas.filter((alerta) => ['ALTA', 'CRITICA'].includes(String(alerta['severidad']).toUpperCase())).length} de prioridad alta o critica`,
-            status: abiertas.length > 0 ? 'danger' : 'ok'
-          }
-        ]);
+        this.alertMetric.set({
+          label: 'Alertas abiertas',
+          value: String(abiertas.length),
+          detail: `${abiertas.filter((alerta) => ['ALTA', 'CRITICA'].includes(String(alerta['severidad']).toUpperCase())).length} de prioridad alta o critica`,
+          status: abiertas.length > 0 ? 'danger' : 'ok'
+        });
       },
       error: () => {
         this.alerts.set([]);
@@ -253,7 +291,7 @@ export class Dashboard {
   }
 
   private timestamp(row: AdminPayload): number {
-    const value = row['fecha_hora_lectura'] ?? row['fecha_creacion'] ?? row['created_at'] ?? row['id'];
+    const value = row['fecha_hora'] ?? row['fecha_hora_lectura'] ?? row['fecha_creacion'] ?? row['created_at'] ?? row['id'];
     if (typeof value === 'number') {
       return value;
     }

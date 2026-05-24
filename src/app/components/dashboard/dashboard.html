@@ -17,6 +17,14 @@
       >
         Riego {{ irrigationState() }}
       </span>
+      <label class="sensor-picker">
+        <span>Sensor de humedad</span>
+        <select [ngModel]="selectedSensorId()" (ngModelChange)="onSensorChange($event)">
+          @for (sensor of soilSensors(); track sensor['id']) {
+            <option [ngValue]="'' + sensor['id']">{{ sensorLabel(sensor) }}</option>
+          }
+        </select>
+      </label>
       <div class="control-buttons">
         <button type="button" class="primary-action" [disabled]="!actuatorId()" (click)="sendIrrigationCommand('Encendido')">
           Encender
