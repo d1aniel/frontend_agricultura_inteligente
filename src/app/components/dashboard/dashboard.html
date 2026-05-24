@@ -8,20 +8,34 @@
     </p>
   </div>
 
-  <div class="irrigation-control">
-    <span class="status-pill" [class.status-on]="irrigationState() === 'Encendido'">
-      Riego {{ irrigationState() }}
-    </span>
-    <div class="control-buttons">
-      <button type="button" class="primary-action" (click)="sendIrrigationCommand('Encendido')">
-        Encender
-      </button>
-      <button type="button" class="secondary-action" (click)="sendIrrigationCommand('Apagado')">
-        Apagar
-      </button>
+  @if (sensorsLoaded() && hasSoilSensor()) {
+    <div class="irrigation-control">
+      <span
+        class="status-pill"
+        [class.status-on]="irrigationState() === 'Encendido'"
+        [class.status-auto]="irrigationState() === 'Automatico'"
+      >
+        Riego {{ irrigationState() }}
+      </span>
+      <div class="control-buttons">
+        <button type="button" class="primary-action" [disabled]="!actuatorId()" (click)="sendIrrigationCommand('Encendido')">
+          Encender
+        </button>
+        <button type="button" class="secondary-action" [disabled]="!actuatorId()" (click)="sendIrrigationCommand('Apagado')">
+          Apagar
+        </button>
+        <button type="button" class="auto-action" [disabled]="!actuatorId()" (click)="sendIrrigationCommand('Automatico')">
+          Automatico
+        </button>
+      </div>
+      <small>{{ commandStatus() }}</small>
     </div>
-    <small>{{ commandStatus() }}</small>
-  </div>
+  } @else {
+    <div class="irrigation-control empty-state">
+      <span class="status-pill">Sin sensor asociado</span>
+      <small>{{ sensorStatus() }}</small>
+    </div>
+  }
 </section>
 
 @if (!hasActiveRole()) {
@@ -35,15 +49,17 @@
     <p>Un administrador debe asignarte un rol activo antes de habilitar los modulos del sistema.</p>
   </section>
 } @else {
-  <section class="metrics-grid" aria-label="Indicadores principales">
-    @for (metric of metrics; track metric.label) {
-      <article [class]="metricClass(metric.status)">
-        <span>{{ metric.label }}</span>
-        <strong>{{ metric.value }}</strong>
-        <p>{{ metric.detail }}</p>
-      </article>
-    }
-  </section>
+  @if (hasSoilSensor()) {
+    <section class="metrics-grid" aria-label="Indicadores principales">
+      @for (metric of metrics(); track metric.label) {
+        <article [class]="metricClass(metric.status)">
+          <span>{{ metric.label }}</span>
+          <strong>{{ metric.value }}</strong>
+          <p>{{ metric.detail }}</p>
+        </article>
+      }
+    </section>
+  }
 
   <section class="work-grid">
     <article class="panel panel-large">
@@ -74,15 +90,17 @@
         </div>
 
         <div class="list">
-          @for (alert of alerts; track alert.type + alert.time) {
+          @for (alert of alerts(); track alert.type + alert.time) {
             <div class="list-item">
               <div>
                 <strong>{{ alert.type }}</strong>
                 <p>{{ alert.message }}</p>
                 <small>{{ alert.source }} - {{ alert.time }}</small>
               </div>
-              <span class="tag tag-high">{{ alert.severity }}</span>
+              <span [class]="severityClass(alert.severity)">{{ alert.severity }}</span>
             </div>
+          } @empty {
+            <p class="muted-message">{{ alertsStatus() }}</p>
           }
         </div>
       </article>

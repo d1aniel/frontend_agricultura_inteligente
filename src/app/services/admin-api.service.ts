@@ -44,6 +44,12 @@ export class AdminApiService {
     });
   }
 
+  activarRiegoAutomatico(actuadorId: number): Observable<AdminPayload> {
+    return this.http.post<AdminPayload>(`${environment.apiUrl}/api_riego/comandos-riego/automatico-manual/`, {
+      actuador_id: actuadorId
+    });
+  }
+
   private url(entity: AdminEntity): string {
     return `${environment.apiUrl}/${entity.apiBasePath}/${entity.endpoint}/`;
   }
