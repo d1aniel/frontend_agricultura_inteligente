@@ -44,12 +44,19 @@ export class Dashboard implements OnDestroy {
   protected readonly sensorsLoaded = signal(false);
   protected readonly hasSoilSensor = signal(false);
   protected readonly soilSensors = signal<AdminPayload[]>([]);
+  protected readonly selectedFarm = signal('');
+  protected readonly selectedParcel = signal('');
   protected readonly selectedSensorId = signal<string>('');
   protected readonly alerts = signal<DashboardAlert[]>([]);
   protected readonly alertsStatus = signal('Cargando alertas...');
   protected readonly sensorStatus = signal('Cargando sensores asociados...');
   protected readonly metrics = computed(() =>
     [this.humidityMetric(), this.nodeMetric(), this.alertMetric()].filter((metric): metric is DashboardMetric => Boolean(metric))
+  );
+  protected readonly farmOptions = computed(() => this.uniqueValues(this.soilSensors(), 'finca_nombre'));
+  protected readonly parcelOptions = computed(() => this.uniqueValues(this.sensorsByFarm(), 'parcela_nombre'));
+  protected readonly filteredSensors = computed(() =>
+    this.sensorsByFarm().filter((sensor) => !this.selectedParcel() || String(sensor['parcela_nombre'] ?? 'Sin parcela') === this.selectedParcel())
   );
 
   private readonly humidityMetric = signal<DashboardMetric | null>(null);
@@ -75,6 +82,17 @@ export class Dashboard implements OnDestroy {
   protected onSensorChange(sensorId: string): void {
     this.selectedSensorId.set(sensorId);
     this.refreshSelectedSensorData();
+  }
+
+  protected onFarmChange(farm: string): void {
+    this.selectedFarm.set(farm);
+    this.selectedParcel.set('');
+    this.selectFirstAvailableSensor();
+  }
+
+  protected onParcelChange(parcel: string): void {
+    this.selectedParcel.set(parcel);
+    this.selectFirstAvailableSensor();
   }
 
   protected sensorLabel(sensor: AdminPayload): string {
@@ -140,7 +158,7 @@ export class Dashboard implements OnDestroy {
         }
 
         if (!this.selectedSensorId()) {
-          this.selectedSensorId.set(String(soilSensors[0]['id']));
+          this.selectFirstAvailableSensor();
         }
 
         this.sensorStatus.set(this.auth.hasAdministrativeRole
@@ -178,6 +196,7 @@ export class Dashboard implements OnDestroy {
         const readings = lecturas
           .filter((lectura) => String(lectura['sensor']) === sensorId)
           .filter((lectura) => this.isMqttReading(lectura))
+          .filter((lectura) => this.isFreshReading(lectura))
           .sort((a, b) => this.timestamp(b) - this.timestamp(a));
         const latest = readings[0];
         const sensor = this.soilSensors().find((item) => String(item['id']) === sensorId);
@@ -186,7 +205,7 @@ export class Dashboard implements OnDestroy {
           this.humidityMetric.set({
             label: 'Humedad suelo',
             value: 'Esperando ESP32',
-            detail: `${sensor?.['nombre'] ?? 'Sensor seleccionado'} aun no reporta lecturas MQTT`,
+            detail: `${sensor?.['nombre'] ?? 'Sensor seleccionado'} no tiene lecturas MQTT recientes`,
             status: 'warn'
           });
           return;
@@ -291,6 +310,23 @@ export class Dashboard implements OnDestroy {
     return ADMIN_ENTITIES.find((entity) => entity.key === key);
   }
 
+  private sensorsByFarm(): AdminPayload[] {
+    return this.soilSensors().filter((sensor) => !this.selectedFarm() || String(sensor['finca_nombre'] ?? 'Sin finca') === this.selectedFarm());
+  }
+
+  private uniqueValues(rows: AdminPayload[], key: string): string[] {
+    const fallback = key === 'finca_nombre' ? 'Sin finca' : 'Sin parcela';
+    return Array.from(new Set(rows.map((row) => String(row[key] ?? fallback))))
+      .filter((value) => value.trim() !== '')
+      .sort((a, b) => a.localeCompare(b));
+  }
+
+  private selectFirstAvailableSensor(): void {
+    const sensor = this.filteredSensors()[0];
+    this.selectedSensorId.set(sensor ? String(sensor['id']) : '');
+    this.refreshSelectedSensorData();
+  }
+
   private timestamp(row: AdminPayload): number {
     const value = row['fecha_hora'] ?? row['fecha_hora_lectura'] ?? row['fecha_creacion'] ?? row['created_at'] ?? row['id'];
     if (typeof value === 'number') {
@@ -302,6 +338,14 @@ export class Dashboard implements OnDestroy {
 
   private isMqttReading(row: AdminPayload): boolean {
     return String(row['observacion'] ?? '').toLowerCase().includes('mqtt');
+  }
+
+  private isFreshReading(row: AdminPayload): boolean {
+    const timestamp = this.timestamp(row);
+    if (!timestamp) {
+      return false;
+    }
+    return Date.now() - timestamp < 120000;
   }
 
   private humidityStatus(value: AdminPayload[string]): DashboardMetric['status'] {

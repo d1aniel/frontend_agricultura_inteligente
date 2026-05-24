@@ -79,9 +79,14 @@ small {
   color: #2f5b8a;
 }
 
+.sensor-filters,
 .sensor-picker {
   display: grid;
   gap: 6px;
+}
+
+.sensor-filters {
+  gap: 10px;
 }
 
 .sensor-picker span {
