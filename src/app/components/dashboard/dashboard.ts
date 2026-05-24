@@ -44,8 +44,10 @@ export class Dashboard implements OnDestroy {
   protected readonly sensorsLoaded = signal(false);
   protected readonly hasSoilSensor = signal(false);
   protected readonly soilSensors = signal<AdminPayload[]>([]);
-  protected readonly selectedFarm = signal('');
-  protected readonly selectedParcel = signal('');
+  protected readonly farms = signal<AdminPayload[]>([]);
+  protected readonly parcels = signal<AdminPayload[]>([]);
+  protected readonly selectedFarmId = signal('');
+  protected readonly selectedParcelId = signal('');
   protected readonly selectedSensorId = signal<string>('');
   protected readonly alerts = signal<DashboardAlert[]>([]);
   protected readonly alertsStatus = signal('Cargando alertas...');
@@ -53,10 +55,16 @@ export class Dashboard implements OnDestroy {
   protected readonly metrics = computed(() =>
     [this.humidityMetric(), this.nodeMetric(), this.alertMetric()].filter((metric): metric is DashboardMetric => Boolean(metric))
   );
-  protected readonly farmOptions = computed(() => this.uniqueValues(this.soilSensors(), 'finca_nombre'));
-  protected readonly parcelOptions = computed(() => this.uniqueValues(this.sensorsByFarm(), 'parcela_nombre'));
+  protected readonly farmOptions = computed(() => this.farms());
+  protected readonly parcelOptions = computed(() =>
+    this.parcels().filter((parcel) => !this.selectedFarmId() || String(parcel['finca']) === this.selectedFarmId())
+  );
   protected readonly filteredSensors = computed(() =>
-    this.sensorsByFarm().filter((sensor) => !this.selectedParcel() || String(sensor['parcela_nombre'] ?? 'Sin parcela') === this.selectedParcel())
+    this.soilSensors().filter((sensor) => {
+      const matchesFarm = !this.selectedFarmId() || String(sensor['finca_id'] ?? '') === this.selectedFarmId();
+      const matchesParcel = !this.selectedParcelId() || String(sensor['parcela_id'] ?? '') === this.selectedParcelId();
+      return matchesFarm && matchesParcel;
+    })
   );
 
   private readonly humidityMetric = signal<DashboardMetric | null>(null);
@@ -84,14 +92,14 @@ export class Dashboard implements OnDestroy {
     this.refreshSelectedSensorData();
   }
 
-  protected onFarmChange(farm: string): void {
-    this.selectedFarm.set(farm);
-    this.selectedParcel.set('');
+  protected onFarmChange(farmId: string): void {
+    this.selectedFarmId.set(farmId);
+    this.selectedParcelId.set('');
     this.selectFirstAvailableSensor();
   }
 
-  protected onParcelChange(parcel: string): void {
-    this.selectedParcel.set(parcel);
+  protected onParcelChange(parcelId: string): void {
+    this.selectedParcelId.set(parcelId);
     this.selectFirstAvailableSensor();
   }
 
@@ -134,6 +142,8 @@ export class Dashboard implements OnDestroy {
   }
 
   private loadDashboardData(): void {
+    this.loadLocationOptions();
+
     const sensorEntity = this.entity('sensor');
     if (!sensorEntity) {
       this.sensorsLoaded.set(true);
@@ -310,21 +320,38 @@ export class Dashboard implements OnDestroy {
     return ADMIN_ENTITIES.find((entity) => entity.key === key);
   }
 
-  private sensorsByFarm(): AdminPayload[] {
-    return this.soilSensors().filter((sensor) => !this.selectedFarm() || String(sensor['finca_nombre'] ?? 'Sin finca') === this.selectedFarm());
-  }
+  private loadLocationOptions(): void {
+    const fincaEntity = this.entity('finca');
+    const parcelaEntity = this.entity('parcela');
 
-  private uniqueValues(rows: AdminPayload[], key: string): string[] {
-    const fallback = key === 'finca_nombre' ? 'Sin finca' : 'Sin parcela';
-    return Array.from(new Set(rows.map((row) => String(row[key] ?? fallback))))
-      .filter((value) => value.trim() !== '')
-      .sort((a, b) => a.localeCompare(b));
+    if (fincaEntity) {
+      this.api.getAll(fincaEntity).subscribe({
+        next: (farms) => this.farms.set(farms),
+        error: () => this.farms.set([])
+      });
+    }
+
+    if (parcelaEntity) {
+      this.api.getAll(parcelaEntity).subscribe({
+        next: (parcels) => this.parcels.set(parcels),
+        error: () => this.parcels.set([])
+      });
+    }
   }
 
   private selectFirstAvailableSensor(): void {
     const sensor = this.filteredSensors()[0];
     this.selectedSensorId.set(sensor ? String(sensor['id']) : '');
-    this.refreshSelectedSensorData();
+    if (sensor) {
+      this.refreshSelectedSensorData();
+      return;
+    }
+    this.humidityMetric.set({
+      label: 'Humedad suelo',
+      value: 'Sin sensor',
+      detail: 'La finca o parcela seleccionada no tiene sensor de humedad asociado',
+      status: 'warn'
+    });
   }
 
   private timestamp(row: AdminPayload): number {

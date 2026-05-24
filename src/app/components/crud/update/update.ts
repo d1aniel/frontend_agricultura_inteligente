@@ -40,7 +40,7 @@ export class Update {
 
     this.api.update(entity, this.id(), this.cleanPayload()).subscribe({
       next: () => this.router.navigate(['/', entity.route]),
-      error: () => this.message.set(`Formulario listo. Endpoint esperado: PUT /${entity.apiBasePath}/${entity.endpoint}/${this.id()}/`)
+      error: (error) => this.message.set(this.errorMessage(error, entity))
     });
   }
 
@@ -128,6 +128,30 @@ export class Update {
     });
 
     return cleaned;
+  }
+
+  private errorMessage(error: { error?: unknown }, entity: AdminEntity): string {
+    const details = this.flattenError(error.error);
+    return details || `No fue posible actualizar. Revisa los campos del formulario o el endpoint PUT /${entity.apiBasePath}/${entity.endpoint}/${this.id()}/`;
+  }
+
+  private flattenError(error: unknown): string {
+    if (!error) {
+      return '';
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    if (Array.isArray(error)) {
+      return error.map((item) => this.flattenError(item)).filter(Boolean).join(' ');
+    }
+    if (typeof error === 'object') {
+      return Object.entries(error as Record<string, unknown>)
+        .map(([key, value]) => `${key}: ${this.flattenError(value)}`)
+        .filter((value) => value.trim() !== '')
+        .join(' ');
+    }
+    return String(error);
   }
 
   private displayRecordTitle(row: AdminPayload): string {

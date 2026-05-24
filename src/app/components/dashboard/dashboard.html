@@ -20,20 +20,20 @@
       <div class="sensor-filters">
         <label class="sensor-picker">
           <span>Finca</span>
-          <select [ngModel]="selectedFarm()" (ngModelChange)="onFarmChange($event)">
+          <select [ngModel]="selectedFarmId()" (ngModelChange)="onFarmChange($event)">
             <option [ngValue]="''">Todas</option>
-            @for (farm of farmOptions(); track farm) {
-              <option [ngValue]="farm">{{ farm }}</option>
+            @for (farm of farmOptions(); track farm['id']) {
+              <option [ngValue]="'' + farm['id']">{{ farm['nombre'] }}</option>
             }
           </select>
         </label>
 
         <label class="sensor-picker">
           <span>Parcela</span>
-          <select [ngModel]="selectedParcel()" (ngModelChange)="onParcelChange($event)">
+          <select [ngModel]="selectedParcelId()" (ngModelChange)="onParcelChange($event)">
             <option [ngValue]="''">Todas</option>
-            @for (parcel of parcelOptions(); track parcel) {
-              <option [ngValue]="parcel">{{ parcel }}</option>
+            @for (parcel of parcelOptions(); track parcel['id']) {
+              <option [ngValue]="'' + parcel['id']">{{ parcel['nombre'] }}</option>
             }
           </select>
         </label>
@@ -43,6 +43,8 @@
           <select [ngModel]="selectedSensorId()" (ngModelChange)="onSensorChange($event)">
             @for (sensor of filteredSensors(); track sensor['id']) {
               <option [ngValue]="'' + sensor['id']">{{ sensorLabel(sensor) }}</option>
+            } @empty {
+              <option [ngValue]="''">Sin sensor asociado</option>
             }
           </select>
         </label>
