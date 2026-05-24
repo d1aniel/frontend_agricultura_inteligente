@@ -17,9 +17,9 @@
         @if (field.relation) {
           <div class="relation-control" [class.relation-control-single]="!canCreateRelated(field)">
             <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
-              <option value="">Seleccionar</option>
+              <option [ngValue]="''">Seleccionar</option>
               @for (row of rowsFor(field); track $index) {
-                <option [value]="optionValue(field, row)">{{ optionLabel(field, row) }}</option>
+                <option [ngValue]="optionValue(field, row)">{{ optionLabel(field, row) }}</option>
               }
             </select>
             @if (canCreateRelated(field)) {
@@ -28,9 +28,9 @@
           </div>
         } @else if (field.type === 'select') {
           <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
-            <option value="">Seleccionar</option>
+            <option [ngValue]="''">Seleccionar</option>
             @for (option of field.options ?? []; track option) {
-              <option [value]="option">{{ option }}</option>
+              <option [ngValue]="option">{{ option }}</option>
             }
           </select>
         } @else if (field.type === 'textarea') {

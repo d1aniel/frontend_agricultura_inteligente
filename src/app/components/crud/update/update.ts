@@ -14,6 +14,7 @@ export class Update {
   protected readonly entity = signal<AdminEntity>(findAdminEntity(undefined));
   protected readonly id = signal('');
   protected readonly payload: AdminPayload = {};
+  protected readonly recordTitle = signal('');
   protected readonly relationOptions = signal<Record<string, AdminPayload[]>>({});
   protected readonly message = signal('Cargando registro...');
   protected readonly formFields = signal<AdminField[]>([]);
@@ -25,8 +26,9 @@ export class Update {
   ) {
     this.route.data.subscribe((data) => {
       this.entity.set(findAdminEntity(data['entityKey']));
-      this.formFields.set(this.entity().fields.filter((field) => field.hideInForm !== true));
+      this.formFields.set(this.entity().fields.filter((field) => field.hideInForm !== true && field.hideInUpdate !== true));
       this.id.set(this.route.snapshot.paramMap.get('id') ?? '');
+      this.recordTitle.set(`${this.entity().label} ${this.id()}`);
       this.loadRelationOptions();
       this.loadRow();
     });
@@ -83,9 +85,11 @@ export class Update {
 
   private setPayload(row: AdminPayload): void {
     Object.keys(this.payload).forEach((key) => delete this.payload[key]);
+    this.recordTitle.set(this.displayRecordTitle(row));
     this.formFields().forEach((field) => {
-      this.payload[field.key] = row[field.key] ?? (field.type === 'checkbox' ? false : '');
+      this.payload[field.key] = this.formatFieldValue(field, row[field.key]);
     });
+    this.message.set('Datos cargados para editar.');
   }
 
   private loadRelationOptions(): void {
@@ -111,6 +115,9 @@ export class Update {
     const cleaned: AdminPayload = {};
 
     this.formFields().forEach((field) => {
+      if (field.readonly) {
+        return;
+      }
       const value = this.payload[field.key];
       if ((field.omitWhenEmpty || (field.type === 'select' && field.required !== true)) && value === '') {
         return;
@@ -121,5 +128,36 @@ export class Update {
     });
 
     return cleaned;
+  }
+
+  private displayRecordTitle(row: AdminPayload): string {
+    const preferredKeys = [
+      'nombre_completo',
+      'nombre',
+      'username',
+      'codigo_nodo',
+      'tipo_alerta',
+      'comando',
+      'respuesta',
+      'tabla_afectada'
+    ];
+    const label = preferredKeys
+      .map((key) => row[key])
+      .find((value) => value !== undefined && value !== null && value !== '');
+
+    return label ? String(label) : `${this.entity().label} ${this.id()}`;
+  }
+
+  private formatFieldValue(field: AdminField, value: AdminPayload[string]): string | number | boolean | null {
+    if (value === undefined || value === null || value === '') {
+      return field.type === 'checkbox' ? false : '';
+    }
+    if (field.type === 'date') {
+      return String(value).slice(0, 10);
+    }
+    if (field.type === 'datetime-local') {
+      return String(value).slice(0, 16);
+    }
+    return value;
   }
 }

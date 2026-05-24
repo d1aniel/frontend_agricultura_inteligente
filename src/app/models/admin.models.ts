@@ -17,6 +17,9 @@ export interface AdminField {
   relation?: AdminRelation;
   hideInList?: boolean;
   hideInForm?: boolean;
+  hideInCreate?: boolean;
+  hideInUpdate?: boolean;
+  readonly?: boolean;
   omitWhenEmpty?: boolean;
 }
 
@@ -328,14 +331,14 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
     idField: 'id',
     requiresAdministrativeRole: true,
     fields: [
-      { key: 'nuevo_username', label: 'Usuario', type: 'text', required: true, hideInList: true, omitWhenEmpty: true },
-      { key: 'nuevos_nombres', label: 'Nombres', type: 'text', required: true, hideInList: true, omitWhenEmpty: true },
-      { key: 'nuevos_apellidos', label: 'Apellidos', type: 'text', required: true, hideInList: true, omitWhenEmpty: true },
-      { key: 'nuevo_email', label: 'Correo', type: 'email', required: true, hideInList: true, omitWhenEmpty: true },
-      { key: 'password_temporal', label: 'Contrasena temporal', type: 'password', required: true, hideInList: true, omitWhenEmpty: true },
-      { key: 'nombre_completo', label: 'Nombre', type: 'text', hideInForm: true },
-      { key: 'username', label: 'Usuario', type: 'text', hideInForm: true },
-      { key: 'email', label: 'Email', type: 'email', hideInForm: true },
+      { key: 'nuevo_username', label: 'Usuario', type: 'text', required: true, hideInList: true, hideInUpdate: true, omitWhenEmpty: true },
+      { key: 'nuevos_nombres', label: 'Nombres', type: 'text', required: true, hideInList: true, hideInUpdate: true, omitWhenEmpty: true },
+      { key: 'nuevos_apellidos', label: 'Apellidos', type: 'text', required: true, hideInList: true, hideInUpdate: true, omitWhenEmpty: true },
+      { key: 'nuevo_email', label: 'Correo', type: 'email', required: true, hideInList: true, hideInUpdate: true, omitWhenEmpty: true },
+      { key: 'password_temporal', label: 'Contrasena temporal', type: 'password', required: true, hideInList: true, hideInUpdate: true, omitWhenEmpty: true },
+      { key: 'nombre_completo', label: 'Nombre', type: 'text', hideInCreate: true, readonly: true },
+      { key: 'username', label: 'Usuario', type: 'text', hideInCreate: true, readonly: true },
+      { key: 'email', label: 'Email', type: 'email', hideInCreate: true, readonly: true },
       { key: 'organizacion', label: 'Organizacion', type: 'select', relation: { entityKey: 'organizacion', labelFields: ['nombre', 'nit_documento'], createRoute: 'organizaciones' } },
       { key: 'telefono', label: 'Telefono', type: 'text' },
       { key: 'estado', label: 'Estado', type: 'select', options: ['ACTIVO', 'INACTIVO', 'BLOQUEADO'] }

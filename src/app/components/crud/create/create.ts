@@ -24,7 +24,7 @@ export class Create {
   ) {
     this.route.data.subscribe((data) => {
       this.entity.set(findAdminEntity(data['entityKey']));
-      this.formFields.set(this.entity().fields.filter((field) => field.hideInForm !== true));
+      this.formFields.set(this.entity().fields.filter((field) => field.hideInForm !== true && field.hideInCreate !== true));
       this.resetPayload();
       this.loadRelationOptions();
     });

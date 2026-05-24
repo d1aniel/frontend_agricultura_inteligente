@@ -2,7 +2,7 @@
   <header class="crud-header">
     <div>
       <p>{{ entity().app }}</p>
-      <h2>Modificar {{ entity().label }} #{{ id() }}</h2>
+      <h2>Modificar {{ recordTitle() }}</h2>
       <small>{{ message() }}</small>
     </div>
 
@@ -16,10 +16,10 @@
 
         @if (field.relation) {
           <div class="relation-control" [class.relation-control-single]="!canCreateRelated(field)">
-            <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
-              <option value="">Seleccionar</option>
+            <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true" [disabled]="field.readonly === true">
+              <option [ngValue]="''">Seleccionar</option>
               @for (row of rowsFor(field); track $index) {
-                <option [value]="optionValue(field, row)">{{ optionLabel(field, row) }}</option>
+                <option [ngValue]="optionValue(field, row)">{{ optionLabel(field, row) }}</option>
               }
             </select>
             @if (canCreateRelated(field)) {
@@ -27,18 +27,18 @@
             }
           </div>
         } @else if (field.type === 'select') {
-          <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true">
-            <option value="">Seleccionar</option>
+          <select [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true" [disabled]="field.readonly === true">
+            <option [ngValue]="''">Seleccionar</option>
             @for (option of field.options ?? []; track option) {
-              <option [value]="option">{{ option }}</option>
+              <option [ngValue]="option">{{ option }}</option>
             }
           </select>
         } @else if (field.type === 'textarea') {
-          <textarea [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true"></textarea>
+          <textarea [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true" [readonly]="field.readonly === true"></textarea>
         } @else if (field.type === 'checkbox') {
-          <input type="checkbox" [name]="field.key" [(ngModel)]="payload[field.key]" />
+          <input type="checkbox" [name]="field.key" [(ngModel)]="payload[field.key]" [disabled]="field.readonly === true" />
         } @else {
-          <input [type]="field.type" [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true" />
+          <input [type]="field.type" [name]="field.key" [(ngModel)]="payload[field.key]" [required]="field.required === true" [readonly]="field.readonly === true" />
         }
       </label>
     }
