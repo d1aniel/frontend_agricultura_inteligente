@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ADMIN_ENTITIES } from '../../models/admin.models';
-import { AdminApiService } from '../../services/admin-api.service';
+import { AdminApiService, AdminPayload } from '../../services/admin-api.service';
 import { AuthService } from '../../services/auth.service';
 
 type IrrigationState = 'Encendido' | 'Apagado';
@@ -24,6 +24,7 @@ export class Dashboard {
   protected readonly hasAdministrativeRole = computed(() => this.auth.hasAdministrativeRole);
   protected readonly irrigationState = signal<IrrigationState>('Apagado');
   protected readonly commandStatus = signal('Sin comandos pendientes');
+  protected readonly actuatorId = signal<number | null>(null);
 
   protected readonly metrics = [
     { label: 'Humedad suelo', value: '42%', detail: 'Parcela Norte - lectura valida', status: 'ok' },
@@ -41,10 +42,19 @@ export class Dashboard {
   constructor(
     private readonly api: AdminApiService,
     private readonly auth: AuthService
-  ) {}
+  ) {
+    this.loadActuator();
+  }
 
   protected sendIrrigationCommand(command: IrrigationState): void {
-    const request = command === 'Encendido' ? this.api.activarRiegoManual(1) : this.api.desactivarRiegoManual(1);
+    const actuatorId = this.actuatorId();
+
+    if (!actuatorId) {
+      this.commandStatus.set('No hay actuadores disponibles para este usuario.');
+      return;
+    }
+
+    const request = command === 'Encendido' ? this.api.activarRiegoManual(actuatorId) : this.api.desactivarRiegoManual(actuatorId);
 
     this.irrigationState.set(command);
     this.commandStatus.set('Enviando comando al backend...');
@@ -57,5 +67,21 @@ export class Dashboard {
 
   protected metricClass(status: string): string {
     return `metric metric-${status}`;
+  }
+
+  private loadActuator(): void {
+    const actuadorEntity = ADMIN_ENTITIES.find((entity) => entity.key === 'actuador');
+    if (!actuadorEntity) {
+      return;
+    }
+
+    this.api.getAll(actuadorEntity).subscribe({
+      next: (actuadores) => {
+        const actuador = actuadores[0] as AdminPayload | undefined;
+        const id = Number(actuador?.['id'] ?? 0);
+        this.actuatorId.set(id > 0 ? id : null);
+      },
+      error: () => this.actuatorId.set(null)
+    });
   }
 }
