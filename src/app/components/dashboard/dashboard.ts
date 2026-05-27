@@ -196,22 +196,11 @@ export class Dashboard implements OnDestroy {
   }
 
   private loadLatestReading(sensorId: string): void {
-    const lecturaEntity = this.entity('lectura_sensor');
-    if (!lecturaEntity) {
-      return;
-    }
-
-    this.api.getAll(lecturaEntity).subscribe({
-      next: (lecturas) => {
-        const readings = lecturas
-          .filter((lectura) => String(lectura['sensor']) === sensorId)
-          .filter((lectura) => this.isMqttReading(lectura))
-          .filter((lectura) => this.isFreshReading(lectura))
-          .sort((a, b) => this.timestamp(b) - this.timestamp(a));
-        const latest = readings[0];
+    this.api.getLatestMqttReading(sensorId).subscribe({
+      next: (latest) => {
         const sensor = this.soilSensors().find((item) => String(item['id']) === sensorId);
 
-        if (!latest) {
+        if (!latest['valor']) {
           this.humidityMetric.set({
             label: 'Humedad suelo',
             value: 'Esperando ESP32',

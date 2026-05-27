@@ -50,6 +50,10 @@ export class AdminApiService {
     });
   }
 
+  getLatestMqttReading(sensorId: string | number): Observable<AdminPayload> {
+    return this.http.get<AdminPayload>(`${environment.apiUrl}/api_iot/lecturas-sensor/latest-mqtt/?sensor_id=${sensorId}`);
+  }
+
   private url(entity: AdminEntity): string {
     return `${environment.apiUrl}/${entity.apiBasePath}/${entity.endpoint}/`;
   }
