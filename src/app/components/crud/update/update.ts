@@ -122,12 +122,20 @@ export class Update {
       if ((field.omitWhenEmpty || (field.type === 'select' && field.required !== true)) && value === '') {
         return;
       }
-      cleaned[field.key] = value === '' && (field.relation || field.type === 'number' || field.type === 'date' || field.type === 'datetime-local')
-        ? null
-        : value;
+      cleaned[field.key] = this.cleanValue(field, value);
     });
 
     return cleaned;
+  }
+
+  private cleanValue(field: AdminField, value: AdminPayload[string]): AdminPayload[string] {
+    if (value === '' && (field.relation || field.type === 'number' || field.type === 'date' || field.type === 'datetime-local')) {
+      return null;
+    }
+    if (field.type === 'number' && typeof value === 'string') {
+      return value.replace(',', '.');
+    }
+    return value;
   }
 
   private errorMessage(error: { error?: unknown }, entity: AdminEntity): string {
