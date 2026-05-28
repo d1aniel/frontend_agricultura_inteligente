@@ -200,7 +200,7 @@ export class Dashboard implements OnDestroy {
       next: (latest) => {
         const sensor = this.soilSensors().find((item) => String(item['id']) === sensorId);
 
-        if (!latest['valor']) {
+        if (!this.hasReadingValue(latest)) {
           this.humidityMetric.set({
             label: 'Humedad suelo',
             value: 'Esperando ESP32',
@@ -362,6 +362,11 @@ export class Dashboard implements OnDestroy {
       return false;
     }
     return Date.now() - timestamp < 120000;
+  }
+
+  private hasReadingValue(row: AdminPayload): boolean {
+    const value = row['valor'];
+    return value !== undefined && value !== null && value !== '';
   }
 
   private humidityStatus(value: AdminPayload[string]): DashboardMetric['status'] {
