@@ -22,6 +22,15 @@ interface DashboardAlert {
   time: string;
 }
 
+interface IrrigationAnalytics {
+  actuador_nombre: string;
+  caudal_galones_hora: number;
+  tiempo_total_horas: number;
+  agua_total_galones: number;
+  activaciones: number;
+  serie_diaria: Array<{ fecha: string; horas: number; galones: number }>;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [FormsModule, RouterLink],
@@ -52,6 +61,7 @@ export class Dashboard implements OnDestroy {
   protected readonly alerts = signal<DashboardAlert[]>([]);
   protected readonly alertsStatus = signal('Cargando alertas...');
   protected readonly sensorStatus = signal('Cargando sensores asociados...');
+  protected readonly irrigationAnalytics = signal<IrrigationAnalytics | null>(null);
   protected readonly metrics = computed(() =>
     [this.humidityMetric(), this.nodeMetric(), this.alertMetric()].filter((metric): metric is DashboardMetric => Boolean(metric))
   );
@@ -299,9 +309,42 @@ export class Dashboard implements OnDestroy {
         this.actuatorId.set(id > 0 ? id : null);
         if (!id) {
           this.commandStatus.set('No hay actuadores disponibles para este usuario.');
+          this.irrigationAnalytics.set(null);
+          return;
         }
+        this.loadIrrigationAnalytics(id);
       },
       error: () => this.actuatorId.set(null)
+    });
+  }
+
+  protected maxDailyGallons(): number {
+    const serie = this.irrigationAnalytics()?.serie_diaria ?? [];
+    return Math.max(1, ...serie.map((item) => Number(item.galones) || 0));
+  }
+
+  protected barHeight(gallons: number): string {
+    return `${Math.max(6, (Number(gallons) / this.maxDailyGallons()) * 100)}%`;
+  }
+
+  protected formatDuration(hours: number): string {
+    const totalMinutes = Math.round((Number(hours) || 0) * 60);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return `${h} h ${m} min`;
+  }
+
+  private loadIrrigationAnalytics(actuatorId: number): void {
+    this.api.getIrrigationAnalytics(actuatorId, 7).subscribe({
+      next: (analytics) => this.irrigationAnalytics.set({
+        actuador_nombre: String(analytics['actuador_nombre'] ?? ''),
+        caudal_galones_hora: Number(analytics['caudal_galones_hora'] ?? 0),
+        tiempo_total_horas: Number(analytics['tiempo_total_horas'] ?? 0),
+        agua_total_galones: Number(analytics['agua_total_galones'] ?? 0),
+        activaciones: Number(analytics['activaciones'] ?? 0),
+        serie_diaria: Array.isArray(analytics['serie_diaria']) ? analytics['serie_diaria'] as IrrigationAnalytics['serie_diaria'] : []
+      }),
+      error: () => this.irrigationAnalytics.set(null)
     });
   }
 

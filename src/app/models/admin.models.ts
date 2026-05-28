@@ -207,6 +207,7 @@ export const ADMIN_ENTITIES: AdminEntity[] = [
       { key: 'tipo_actuador', label: 'Tipo', type: 'select', options: ['RELE', 'BOMBA', 'VALVULA', 'MOTOR'] },
       { key: 'modelo', label: 'Modelo', type: 'text' },
       { key: 'pin_conexion', label: 'Pin', type: 'text' },
+      { key: 'caudal_galones_hora', label: 'Caudal galones/hora', type: 'number' },
       { key: 'estado_actual', label: 'Estado actual', type: 'select', options: ['ENCENDIDO', 'APAGADO', 'ERROR'] },
       { key: 'fecha_instalacion', label: 'Instalacion', type: 'date' },
       { key: 'estado', label: 'Estado', type: 'select', options: ['ACTIVO', 'INACTIVO', 'MANTENIMIENTO'] }

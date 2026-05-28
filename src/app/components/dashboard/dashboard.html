@@ -93,6 +93,59 @@
     </section>
   }
 
+  @if (irrigationAnalytics(); as analytics) {
+    <section class="analytics-grid">
+      <article class="panel analytics-summary">
+        <div class="panel-header compact">
+          <div>
+            <p class="eyebrow">Historial de riego</p>
+            <h3>Tiempo de bomba y agua estimada</h3>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div>
+            <span>Caudal</span>
+            <strong>{{ analytics.caudal_galones_hora }} gal/h</strong>
+          </div>
+          <div>
+            <span>Tiempo encendida</span>
+            <strong>{{ formatDuration(analytics.tiempo_total_horas) }}</strong>
+          </div>
+          <div>
+            <span>Agua estimada</span>
+            <strong>{{ analytics.agua_total_galones }} gal</strong>
+          </div>
+          <div>
+            <span>Activaciones</span>
+            <strong>{{ analytics.activaciones }}</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel chart-panel">
+        <div class="panel-header compact">
+          <div>
+            <p class="eyebrow">Ultimos 7 dias</p>
+            <h3>Galones usados por dia</h3>
+          </div>
+        </div>
+        <div class="bar-chart">
+          @for (item of analytics.serie_diaria; track item.fecha) {
+            <div class="bar-item">
+              <span class="bar-value">{{ item.galones }}</span>
+              <div class="bar-track">
+                <div class="bar-fill" [style.height]="barHeight(item.galones)"></div>
+              </div>
+              <small>{{ item.fecha.slice(5) }}</small>
+            </div>
+          } @empty {
+            <p class="muted-message">Todavia no hay historial de bomba encendida.</p>
+          }
+        </div>
+      </article>
+    </section>
+  }
+
   <section class="work-grid">
     <article class="panel panel-large">
       <div class="panel-header">

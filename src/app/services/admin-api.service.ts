@@ -54,6 +54,10 @@ export class AdminApiService {
     return this.http.get<AdminPayload>(`${environment.apiUrl}/api_iot/lecturas-sensor/latest-mqtt/?sensor_id=${sensorId}`);
   }
 
+  getIrrigationAnalytics(actuatorId: string | number, days = 7): Observable<AdminPayload> {
+    return this.http.get<AdminPayload>(`${environment.apiUrl}/api_riego/estados-riego/analitica/?actuador_id=${actuatorId}&dias=${days}`);
+  }
+
   private url(entity: AdminEntity): string {
     return `${environment.apiUrl}/${entity.apiBasePath}/${entity.endpoint}/`;
   }

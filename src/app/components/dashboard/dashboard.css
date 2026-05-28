@@ -148,7 +148,8 @@ button:disabled {
 }
 
 .metrics-grid,
-.work-grid {
+.work-grid,
+.analytics-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
@@ -189,6 +190,10 @@ button:disabled {
 
 .work-grid {
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+}
+
+.analytics-grid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
 }
 
 .panel {
@@ -274,9 +279,70 @@ button:disabled {
   font-size: 14px;
 }
 
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-grid div {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #edf2ef;
+  border-radius: 8px;
+  background: #fbfdfb;
+}
+
+.summary-grid span {
+  color: #526158;
+  font-size: 12px;
+}
+
+.summary-grid strong {
+  font-size: 20px;
+}
+
+.bar-chart {
+  min-height: 180px;
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.bar-item {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto 140px auto;
+  gap: 6px;
+  text-align: center;
+}
+
+.bar-value {
+  color: #526158;
+  font-size: 12px;
+}
+
+.bar-track {
+  display: flex;
+  align-items: end;
+  border-radius: 8px;
+  background: #edf2ef;
+  overflow: hidden;
+}
+
+.bar-fill {
+  width: 100%;
+  min-height: 6px;
+  border-radius: 8px 8px 0 0;
+  background: #245a35;
+}
+
 @media (max-width: 1050px) {
   .hero-panel,
-  .work-grid {
+  .work-grid,
+  .analytics-grid {
     grid-template-columns: 1fr;
   }
 
@@ -291,7 +357,8 @@ button:disabled {
   }
 
   .control-buttons,
-  .metrics-grid {
+  .metrics-grid,
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 

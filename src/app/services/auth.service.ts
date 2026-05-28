@@ -20,6 +20,8 @@ export class AuthService {
 
   private readonly tokenKey = 'agro_auth_token';
   private readonly userKey = 'agro_auth_user';
+  private readonly lastActivityKey = 'agro_auth_last_activity';
+  private readonly sessionTimeoutMs = 30 * 60 * 1000;
 
   private readonly userSubject = new BehaviorSubject<AuthUser | null>(this.loadUser());
   readonly user$ = this.userSubject.asObservable();
@@ -30,7 +32,12 @@ export class AuthService {
     if (!this.hasStorage()) {
       return null;
     }
-    return localStorage.getItem(this.tokenKey);
+    if (this.isSessionExpired()) {
+      this.clearSession();
+      return null;
+    }
+    this.touchSession();
+    return sessionStorage.getItem(this.tokenKey);
   }
 
   get isAuthenticated(): boolean {
@@ -117,22 +124,24 @@ export class AuthService {
 
   clearSession(): void {
     if (this.hasStorage()) {
-      localStorage.removeItem(this.tokenKey);
-      localStorage.removeItem(this.userKey);
+      sessionStorage.removeItem(this.tokenKey);
+      sessionStorage.removeItem(this.userKey);
+      sessionStorage.removeItem(this.lastActivityKey);
     }
     this.userSubject.next(null);
   }
 
   private saveSession(response: AuthTokenResponse): void {
     if (this.hasStorage()) {
-      localStorage.setItem(this.tokenKey, response.token);
+      sessionStorage.setItem(this.tokenKey, response.token);
+      this.touchSession();
     }
     this.saveUser(response.usuario);
   }
 
   private saveUser(user: AuthUser): void {
     if (this.hasStorage()) {
-      localStorage.setItem(this.userKey, JSON.stringify(user));
+      sessionStorage.setItem(this.userKey, JSON.stringify(user));
     }
     this.userSubject.next(user);
   }
@@ -142,11 +151,44 @@ export class AuthService {
       return null;
     }
 
-    const rawUser = localStorage.getItem(this.userKey);
+    if (this.isSessionExpired()) {
+      this.clearStoredSession();
+      return null;
+    }
+
+    const rawUser = sessionStorage.getItem(this.userKey);
     return rawUser ? (JSON.parse(rawUser) as AuthUser) : null;
   }
 
   private hasStorage(): boolean {
-    return typeof localStorage !== 'undefined';
+    return typeof sessionStorage !== 'undefined';
+  }
+
+  private touchSession(): void {
+    if (this.hasStorage()) {
+      sessionStorage.setItem(this.lastActivityKey, String(Date.now()));
+    }
+  }
+
+  private isSessionExpired(): boolean {
+    if (!this.hasStorage()) {
+      return true;
+    }
+
+    const token = sessionStorage.getItem(this.tokenKey);
+    if (!token) {
+      return false;
+    }
+
+    const lastActivity = Number(sessionStorage.getItem(this.lastActivityKey) ?? 0);
+    return lastActivity > 0 && Date.now() - lastActivity > this.sessionTimeoutMs;
+  }
+
+  private clearStoredSession(): void {
+    if (this.hasStorage()) {
+      sessionStorage.removeItem(this.tokenKey);
+      sessionStorage.removeItem(this.userKey);
+      sessionStorage.removeItem(this.lastActivityKey);
+    }
   }
 }
