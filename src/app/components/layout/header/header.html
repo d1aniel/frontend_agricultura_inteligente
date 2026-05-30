@@ -5,6 +5,34 @@
   </div>
 
   <div class="user-area">
+    @if (canSeeNotifications) {
+      <div class="notification-wrap">
+        <button type="button" class="notification-button" (click)="toggleNotifications()" aria-label="Notificaciones">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 16v-5a6 6 0 0 0-12 0v5l-2 2h16l-2-2Z"></path>
+            <path d="M9 20a3 3 0 0 0 6 0"></path>
+          </svg>
+          @if (notificationCount > 0) {
+            <span>{{ notificationCount }}</span>
+          }
+        </button>
+
+        @if (notificationsOpen()) {
+          <div class="notification-panel">
+            <strong>Solicitudes de contrasena</strong>
+            @for (notification of notifications(); track notification['id']) {
+              <a [routerLink]="['/alertas-sistema']">
+                <span>{{ notification['tipo_alerta'] }}</span>
+                <small>{{ notification['mensaje'] }}</small>
+              </a>
+            } @empty {
+              <p>No hay solicitudes abiertas.</p>
+            }
+          </div>
+        }
+      </div>
+    }
+
     <div class="user-chip">
       <span>{{ initials }}</span>
       <strong>{{ user?.nombre_completo || user?.username || 'Usuario' }}</strong>
