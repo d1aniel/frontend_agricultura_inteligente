@@ -15,6 +15,8 @@ export class App {
   constructor(private readonly router: Router) {}
 
   isAuthRoute(): boolean {
-    return ['/login', '/olvide-contrasena', '/cambiar-contrasena-temporal'].some((path) => this.router.url.startsWith(path));
+    return ['/login', '/olvide-contrasena', '/restablecer-contrasena', '/cambiar-contrasena-temporal'].some((path) =>
+      this.router.url.startsWith(path)
+    );
   }
 }
