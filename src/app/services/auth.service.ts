@@ -8,7 +8,8 @@ import {
   ChangeTemporaryPasswordPayload,
   ForgotPasswordPayload,
   LoginPayload,
-  RegisterPayload
+  RegisterPayload,
+  ResetPasswordPayload
 } from '../models/auth.models';
 
 @Injectable({
@@ -104,6 +105,10 @@ export class AuthService {
 
   forgotPassword(payload: ForgotPasswordPayload): Observable<{ detail: string }> {
     return this.http.post<{ detail: string }>(`${this.authUrl}/olvide-password/`, payload);
+  }
+
+  resetPassword(payload: ResetPasswordPayload): Observable<{ detail: string }> {
+    return this.http.post<{ detail: string }>(`${this.authUrl}/restablecer-password/`, payload);
   }
 
   changeTemporaryPassword(payload: ChangeTemporaryPasswordPayload): Observable<{ detail: string; usuario: AuthUser }> {

@@ -3,6 +3,7 @@ import { Create } from './components/crud/create/create';
 import { Login } from './components/auth/login/login';
 import { ForgotPassword } from './components/auth/forgot-password/forgot-password';
 import { ChangeTemporaryPassword } from './components/auth/change-temporary-password/change-temporary-password';
+import { ResetPassword } from './components/auth/reset-password/reset-password';
 import { Delete } from './components/crud/delete/delete';
 import { Getall } from './components/crud/getall/getall';
 import { Update } from './components/crud/update/update';
@@ -39,6 +40,7 @@ const crudRoutes: Routes = ADMIN_ENTITIES
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard], title: 'Iniciar sesion' },
   { path: 'olvide-contrasena', component: ForgotPassword, canActivate: [guestGuard], title: 'Recuperar acceso' },
+  { path: 'restablecer-contrasena', component: ResetPassword, canActivate: [guestGuard], title: 'Restablecer contrasena' },
   { path: 'cambiar-contrasena-temporal', component: ChangeTemporaryPassword, canActivate: [authGuard], title: 'Cambiar contrasena' },
   { path: 'cambiar-contrasena', component: ChangePassword, canActivate: [authGuard], title: 'Cambiar contrasena' },
   { path: '', component: Dashboard, canActivate: [authGuard], title: 'Panel general' },

@@ -41,3 +41,9 @@ export interface ChangeTemporaryPasswordPayload {
   password_actual: string;
   nueva_password: string;
 }
+
+export interface ResetPasswordPayload {
+  uid: string;
+  token: string;
+  nueva_password: string;
+}
