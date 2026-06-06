@@ -7,6 +7,9 @@ export const authGuard: CanActivateFn = (_route, state) => {
   const router = inject(Router);
 
   if (auth.isAuthenticated) {
+    if (auth.currentUser?.requiere_cambio_password === true && !state.url.startsWith('/cambiar-contrasena-temporal')) {
+      return router.createUrlTree(['/cambiar-contrasena-temporal']);
+    }
     return true;
   }
 
@@ -19,6 +22,10 @@ export const guestGuard: CanActivateFn = () => {
 
   if (!auth.isAuthenticated) {
     return true;
+  }
+
+  if (auth.currentUser?.requiere_cambio_password === true) {
+    return router.createUrlTree(['/cambiar-contrasena-temporal']);
   }
 
   return router.createUrlTree(['/']);
