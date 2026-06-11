@@ -38,12 +38,12 @@ export class ResetPassword {
       return;
     }
     if (this.form.nueva_password !== this.form.confirmar_password) {
-      this.message.set('Las contrasenas no coinciden.');
+      this.message.set('Las contraseñas no coinciden.');
       return;
     }
 
     this.loading.set(true);
-    this.message.set('Actualizando contrasena...');
+    this.message.set('Actualizando contraseña...');
 
     this.auth.resetPassword({
       uid: this.uid,
@@ -57,7 +57,7 @@ export class ResetPassword {
       },
       error: (error) => {
         this.loading.set(false);
-        this.message.set(error?.error?.detail || 'No fue posible restablecer la contrasena.');
+        this.message.set(error?.error?.detail || 'No fue posible restablecer la contraseña.');
       }
     });
   }

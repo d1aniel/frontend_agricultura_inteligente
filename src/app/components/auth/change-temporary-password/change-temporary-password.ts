@@ -26,12 +26,12 @@ export class ChangeTemporaryPassword {
 
   protected submit(): void {
     if (this.form.nueva_password !== this.form.confirmar_password) {
-      this.message.set('La confirmacion no coincide con la nueva contrasena.');
+      this.message.set('La confirmacion no coincide con la nueva contraseña.');
       return;
     }
 
     this.loading.set(true);
-    this.message.set('Actualizando contrasena...');
+    this.message.set('Actualizando contraseña...');
 
     this.auth.changeTemporaryPassword({
       password_actual: this.form.password_actual,
@@ -40,7 +40,7 @@ export class ChangeTemporaryPassword {
       next: () => this.router.navigate(['/']),
       error: () => {
         this.loading.set(false);
-        this.message.set('No se pudo actualizar la contrasena.');
+        this.message.set('No se pudo actualizar la contraseña.');
       }
     });
   }
